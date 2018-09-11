@@ -1858,7 +1858,6 @@ kontra.store = {
    * @param {Context} [properties.context=kontra.context] - Provide a context for the tile engine to draw on.
    */
   kontra.tileEngine = function(properties) {
-    console.log(properties)
     properties = properties || {};
 
     // size of the map (in tiles)
@@ -1948,9 +1947,7 @@ kontra.store = {
             continue;
           }
 
-          console.log(tile,"harsh")
           tileset = getTileset(tile);
-          console.log(tileset,"harsh")
           image = tileset.image;
 
           x = (j % width) * tileWidth;
@@ -2032,7 +2029,6 @@ kontra.store = {
       addTilesets: function addTilesets(tilesets) {
         [].concat(tilesets).map(function(tileset) {
           let tilesetImage = tileset.image;
-          console.log(tilesetImage,"testing")
           let image, firstGrid, numTiles, lastTileset, tiles;
 
           // @see https://github.com/jed/140bytes/wiki/Byte-saving-techniques#coercion-to-test-for-types
@@ -2042,8 +2038,6 @@ kontra.store = {
             while (i >= 0) {
               i = tilesetImage.lastIndexOf('/', i);
               let path = (i < 0 ? tilesetImage : tilesetImage.substr(i));
-              console.log(path,"testing")
-              console.log(kontra.assets.images[path],"testing")
 
               if (kontra.assets.images[path]) {
                 image = kontra.assets.images[path];
@@ -2056,7 +2050,6 @@ kontra.store = {
           else {
             image = tilesetImage;
           }
-          console.log(image)
           firstGrid = tileset.firstGrid;
 
           // if the width or height of the provided image is smaller than the tile size,
@@ -2180,7 +2173,6 @@ kontra.store = {
         for (let r = row; r <= endRow; r++) {
           for (let c = col; c <= endCol; c++) {
             index = getIndex({row: r, col: c});
-            console.log(name)
             if (tileEngine.layers[name].data[index]) {
               return true;
             }
@@ -2232,7 +2224,6 @@ kontra.store = {
        */
       renderLayer: function renderLayer(name) {
         let layer = tileEngine.layers[name];
-        console.log(name)
 
         // calculate the starting tile
         let row = tileEngine.getRow();

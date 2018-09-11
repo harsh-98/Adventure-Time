@@ -25,8 +25,8 @@
 
 <body>
 
-  <!-- <canvas width="652" height="276"></canvas> -->
-  <canvas width="1600" height="800"></canvas>
+  <canvas width="352" height="176"></canvas>
+  <!-- <canvas width="1600" height="800"></canvas> -->
   <!-- <p>M - Mute</p> -->
   <script id="code">
     kontra.init();
@@ -71,6 +71,12 @@
         }
       });
 
+      var ghosts = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 18
+      });
+
+
       var ghost_animation = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
@@ -94,51 +100,34 @@
           }
         }
       });
+
+      var lamps = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 49
+      });
+
       var lamp_animation = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
         frameHeight: 16,
         animations: {
           default: {
-            frames: [107,108,109],  // frames 105 through 112
+            frames: [107, 108, 109],  // frames 105 through 112
             frameRate: 6
           }
         }
       });
 
-      var ghosts = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 18
-      });
-      var lamps = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 49
-      });
-
-
       function spawnLamp() {
-        var arrx = [48,112,112,48,
-        688,  688,  688,  688,  688,  688,  688,  688,  688,  688,  688,
-        688,  720,  720,  720,  752,  784,  784,  816,  848,  848,  848,
-        848,  880,  880,  912,  912,  944,  944,  976,  976, 1008, 1008,
-       1040, 1040, 1072, 1072, 1104, 1104, 1104, 1104, 1104, 1104, 1104,
-       1104];
-
-        var arry = [48,48,96,96,
-        976,  992, 1008, 1024, 1040, 1056, 1072, 1088, 1104, 1120, 1136,
-       1152,  960,  976, 1152,  960,  960, 1152, 1152,  960, 1120, 1136,
-       1152,  960, 1120,  960, 1120,  960, 1120,  960, 1120,  960, 1120,
-        960, 1120,  960, 1120,  960,  976,  992, 1008, 1024, 1040, 1104,
-       1120];
-
+        var arry = [48, 48, 96, 96, 336, 336, 336, 336, 336, 336, 336, 336, 336, 336, 336, 336, 352, 352, 352, 368, 384, 384, 400, 416, 416, 416, 416, 432, 432, 448, 448, 464, 464, 480, 480, 496, 496, 512, 512, 528, 528, 544, 544, 544, 544, 544, 544, 544, 544];
+        var arrx = [48, 112, 48, 112, 976, 992, 1008, 1024, 1040, 1056, 1072, 1088, 1104, 1120, 1136, 1152, 960, 976, 1152, 960, 960, 1152, 1152, 960, 1120, 1136, 1152, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 976, 992, 1008, 1024, 1040, 1104, 1120];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          console.log(x, " ", y);
           lamps.get({
             x: x,
             y: y,
-            startX:x,
-            startY:y,
+            startX: x,
+            startY: y,
             animations: lamp_animation.animations,
             ttl: Infinity,
             type: 'lamp',
@@ -146,13 +135,61 @@
               this.advance();
 
               // change enemy velocity to move back and forth
-              this.x = this.startX -tileEngine.sx;
-              this.y = this.startY -tileEngine.sy;
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
             },
           });
         }
       }
       spawnLamp();
+
+      var traps = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 30
+      });
+
+      var trap_animation = kontra.spriteSheet({
+        image: kontra.assets.images.new,
+        frameWidth: 16,
+        frameHeight: 16,
+        animations: {
+          pattern1: {
+            frames: [103, 104, 105],  // frames 105 through 112
+            frameRate: 2
+          },
+          pattern0: {
+            frames: [104, 105, 103],  // frames 105 through 112
+            frameRate: 2
+          }
+        }
+      });
+
+      function spawnTrap() {
+        var arry = [320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 320, 336, 336, 336, 352, 352, 368, 560, 560, 560, 576, 576, 576, 592, 592, 592, 592];
+        var arrx = [960, 976, 992, 1008, 1024, 1040, 1056, 1072, 1088, 1104, 1120, 1136, 1152, 1168, 944, 960, 1168, 944, 1168, 944, 1024, 1040, 1120, 1040, 1104, 1120, 1040, 1056, 1088, 1104];
+        for (var i in arrx) {
+          var x = arrx[i], y = arry[i];
+          traps.get({
+            x: x,
+            y: y,
+            startX: x,
+            startY: y,
+            animations: trap_animation.animations,
+            ttl: Infinity,
+            type: 'trap',
+            update: function () {
+              this.advance();
+              // (function (self,name_){
+              //   self.playAnimation(name_)
+              // })(this, 'pattern' + Math.floor(Math.random()*2 ))
+              // change enemy velocity to move back and forth
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
+            },
+          });
+        }
+      }
+      spawnTrap();
 
       function spawnWave() {
         var arrx = [48];
@@ -164,8 +201,8 @@
           ghosts.get({
             x: x,
             y: y,
-            startX:x,
-            startY:y,
+            startX: x,
+            startY: y,
             dx: .5,
             animations: ghost_animation.animations,
             ttl: Infinity,
@@ -181,8 +218,8 @@
               this.advance();
 
               // change enemy velocity to move back and forth
-              this.x =  -tileEngine.sx;
-              this.y = this.startY -tileEngine.sy;
+              this.x = -tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
 
               if (this.x <= this.leftEdge) {
                 this.dx = this.speedx;
@@ -193,17 +230,17 @@
 
 
 
-              if(this.dx >0 ){
-                this.playAnimation('walk_right');
-              }else if(this.dx<0){
-                this.playAnimation('walk_left');
-              }
-              if(this.dy >0 ){
-                this.playAnimation('walk_down');
-              }else if(this.dy<0){
-                this.playAnimation('walk_up');
-              }
-            // dy: .5,
+              // if(this.dx >0 ){
+              //   this.playAnimation('walk_right');
+              // }else if(this.dx<0){
+              //   this.playAnimation('walk_left');
+              // }
+              // if(this.dy >0 ){
+              //   this.playAnimation('walk_down');
+              // }else if(this.dy<0){
+              //   this.playAnimation('walk_up');
+              // }
+              // dy: .5,
               // else if (this.y >= thisthis.startX.bottomEdge) {
               //   // this.dy = 0;
               //   // this.y -= 5;
@@ -327,6 +364,7 @@
           player.update();
           ghosts.update();
           lamps.update();
+          traps.update();
           if (ghosts.getAliveObjects().length === 0) {
             spawnWave();
           }
@@ -336,6 +374,7 @@
           player.render();
           ghosts.render();
           lamps.render();
+          traps.render();
 
         }
       });
