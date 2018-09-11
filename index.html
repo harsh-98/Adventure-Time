@@ -4,20 +4,45 @@
 <head>
   <title>Tile Engine</title>
   <style>
-    *,
-    html,
-    head,
-    body {
+    * {
       margin: 0;
-      padding: 0;
       border: 0;
+    }
+
+    body {
+      background-color: black;
+    }
+
+    div#float {
+      color: white;
+      float: right;
+      margin: 40px;
+      font-size: 25px;
     }
 
     canvas {
       background: black;
-      width: 1000px;
+      width: 1100px;
       height: 600px;
 
+    }
+
+    button {
+      background-color: #4CAF50;
+      /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    #{
+ color: #4CAF50;
     }
   </style>
   <script type="text/javascript" src="kontra.js"></script>
@@ -25,27 +50,91 @@
 
 <body>
 
-  <!-- <canvas width="352" height="176"></canvas> -->
+  <!-- <canvas width="352" height="180"></canvas> -->
   <canvas width="1600" height="800"></canvas>
-  <!-- <p>M - Mute</p> -->
+
+  <div id="float">
+    <div id="dis">Score:
+      <span id="score">0</span>
+    </div>
+    <button id="button" style="display:none" onclick="startGame()">Restart</button>
+    <div id="state">Game Started</div>
+  </div>
   <script id="code">
     kontra.init();
+    var playscore = 0, stag = document.getElementById('score'), button = document.getElementById('button'), state = document.getElementById('state');
+
 
     kontra.assets.imagePath = 'assets/';
     kontra.assets.dataPath = 'assets/';
+    function startGame() {
+      location.reload();
+    };
+    setTimeout(function () {
+      state.innerHTML = "";
+      document.getElementById('button').style.display = "inline-block";
+    }, 2000);
 
     kontra.assets.load('terrain.json', 'man.png', 'new.png').then(function () {
-      // kontra.assets.load('terrain.json', 'man.png','things.png','basictiles.png',['Digital_Forest.mp3', 'Digital_Forest.mp3']).then(function() {
       var terrain = kontra.assets.data.terrain;
       var quadtree = kontra.quadtree();
-      // setup tile engine
-      var tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
-      // tileEngine.sx = terrain.width * terrain.tilewidth / 2 - kontra.canvas.width / 2,
-      // tileEngine.sy = terrain.height * terrain.tileheight - kontra.canvas.height
+      tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
       tileEngine.sx = 0,
         tileEngine.sy = 0
 
+      var tsure = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 57
+      });
+      var tsure_animation = kontra.spriteSheet({
+        image: kontra.assets.images.new,
+        frameWidth: 16,
+        frameHeight: 16,
+        animations: {
+          gold: {
+            frames: [90],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          gems: {
+            frames: [91],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          }
+        }
+      });
 
+      function spawnTsure() {
+        var arry = [16, 32, 32, 32, 64, 64, 64, 80, 80, 80, 112, 128, 128, 128, 128, 144, 144, 144, 160, 160, 208, 224, 224, 240, 256, 256, 352, 368, 368, 400, 448, 448, 464, 480, 480, 496, 496, 496, 496, 496, 528, 544, 544, 576, 576, 592, 688, 688, 704, 704, 704, 720, 720, 736, 736, 752, 752];
+        var arrx = [416, 352, 368, 448, 64, 80, 96, 64, 80, 96, 1152, 496, 512, 528, 1168, 512, 528, 1152, 528, 1168, 336, 304, 384, 352, 304, 368, 1120, 1008, 1040, 1104, 1008, 1072, 976, 1040, 1056, 608, 688, 1024, 1072, 1088, 640, 608, 672, 608, 640, 672, 944, 1024, 336, 416, 976, 400, 1008, 368, 960, 960, 992];
+        for (var i in arrx) {
+          var x = arrx[i], y = arry[i];
+          var type = ['gold', 'gems'];
+          var type = type[Math.floor(Math.random() * 2)]
+          console.log(type);
+          tsure.get(function (types) {
+            return {
+              x: x,
+              y: y,
+              startX: x,
+              startY: y,
+              animations: tsure_animation.animations,
+              ttl: Infinity,
+              type: types,
+              way: 1,
+              update: function () {
+                if (this.way == 1) {
+                  this.playAnimation(types)
+                  this.way = 0
+                }
+                this.x = this.startX - tileEngine.sx;
+                this.y = this.startY - tileEngine.sy;
+              }
+            }
+          }(type));
+        }
+      }
+      spawnTsure();
 
       var Switch = kontra.pool({
         create: kontra.sprite,
@@ -57,12 +146,12 @@
         frameHeight: 16,
         animations: {
           gate_open: {
-            frames: [100,101,102],  // frames 105 through 112
+            frames: [100, 101, 102],  // frames 105 through 112
             frameRate: 3,
             loop: false
           },
           gate_close: {
-            frames: [102,101,100],  // frames 105 through 112
+            frames: [102, 101, 100],  // frames 105 through 112
             frameRate: 3,
             loop: false
           },
@@ -88,20 +177,20 @@
             ttl: Infinity,
             count: 30,
             way: 1,
-            start:1,
+            start: 1,
             type: 'switch',
-            toggle: function() {
-              if(this.way){
+            toggle: function () {
+              if (this.way) {
                 this.playAnimation('gate_open')
-                this.way =0
-              }else {
+                this.way = 0
+              } else {
                 this.playAnimation('gate_close')
                 this.way = 1
               }
             },
             update: function () {
               this.advance();
-              if(this.start){
+              if (this.start) {
                 this.playAnimation('no_motion')
                 this.start = 0
               }
@@ -130,7 +219,7 @@
             loop: false
           },
           gate_close: {
-            frames: [59,9,93,48],  // frames 105 through 112
+            frames: [59, 9, 93, 48],  // frames 105 through 112
             frameRate: 3,
             loop: false
           },
@@ -143,8 +232,8 @@
       });
 
       function spawnsGate() {
-        var arry = [112, 592,80];
-        var arrx = [80, 1072,400];
+        var arry = [112, 592, 80];
+        var arrx = [80, 1072, 400];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           sgate.get({
@@ -153,22 +242,22 @@
             startX: x,
             startY: y,
             way: 1,
-            start:1,
+            start: 1,
             animations: sgate_animation.animations,
             ttl: Infinity,
             type: 'gate',
-            toggle: function() {
-              if(this.way){
+            toggle: function () {
+              if (this.way) {
                 this.playAnimation('gate_open')
-                this.way =0
-              }else {
+                this.way = 0
+              } else {
                 this.playAnimation('gate_close')
                 this.way = 1
               }
             },
             update: function () {
               this.advance();
-              if(this.start){
+              if (this.start) {
                 this.playAnimation('no_motion')
                 this.start = 0
               }
@@ -301,46 +390,125 @@
         }
       });
 
+      // function () {
+      //     console.log(this)
+      //     this.advance();
+
+      //     // change enemy velocity to move back and forth
+      //     this.X += this.speedx;
+      //     this.x = this.startX + this.X - tileEngine.sx;
+
+      //     if (this.X <= this.leftEdge) {
+      //       this.speedx = Math.abs(this.speedx);
+      //     }
+      //     else if (this.X >= this.rightEdge) {
+      //       this.speedx = -Math.abs(this.speedx);
+      //     }
+
+      //     if (this.speedx > 0) {
+      //       this.playAnimation('walk_right')
+      //     } else if (this.speedx < 0) {
+      //       this.playAnimation('walk_left')
+      //     }
+      // }
+      // function () {
+      //   // return function () {
+
+      //     this.advance();
+
+      //     // change enemy velocity to move back and forth
+      //     this.Y += this.speedy;
+      //     this.y = this.startY + this.Y - tileEngine.sy;
+
+      //     if (this.Y <= this.topEdge) {
+      //       this.speedy = Math.abs(this.speedy);
+      //     }
+      //     else if (this.Y >= this.bottomEdge) {
+      //       this.speedy = -Math.abs(this.speedy);
+      //     }
+
+      //     if (this.speedy > 0) {
+      //       this.playAnimation('walk_down')
+      //     } else if (this.speedy < 0) {
+      //       this.playAnimation('walk_up')
+      //     }
+      //   // }
+      // }
+
       function spawnGhost() {
-        var arrx = [48];
-        var arry = [192];
+        var arrx = [];
+        var arry = [160, 192, 208, 224, 320, 368];
+        var arrx = [384, 1424, 80, 1168, 288, 80];
+        var arrY = [400, 496, 496, 512, 512, 560, 560, 560, 672, 720];
+        var arrX = [32, 800, 832, 240, 448, 272, 784, 816, 1120, 896];
         var width = 16;
-        var spacer = y * 1.5;
+
+        // var funarr = [horver,]
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           ghosts.get({
             x: x,
             y: y,
+            X: 0,
             startX: x,
             startY: y,
-            dx: .5,
             animations: ghost_animation.animations,
             ttl: Infinity,
-            leftEdge: x - 48,
-            rightEdge: x + 48 + width,
-            bottomEdge: y + 64,
-            topEdge: y - 16,
+            leftEdge: -32,
+            rightEdge: 32 + width,
             speedx: .5,
-            speedy: .5,
+            type: 'ghost',
+            update: function () {
+              console.log(this)
+              this.advance();
 
+              this.X += this.speedx;
+              this.x = this.startX + this.X - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
+              if (this.X <= this.leftEdge) {
+                this.speedx = Math.abs(this.speedx);
+              }
+              else if (this.X >= this.rightEdge) {
+                this.speedx = -Math.abs(this.speedx);
+              }
+              if (this.speedx > 0) {
+                this.playAnimation('walk_right')
+              } else if (this.speedx < 0) {
+                this.playAnimation('walk_left')
+              }
+            },
+          });
+        }
+        for (var i in arrX) {
+          var x = arrX[i], y = arrY[i];
+          ghosts.get({
+            x: x,
+            y: y,
+            Y: 0,
+            startX: x,
+            startY: y,
+            animations: ghost_animation.animations,
+            ttl: Infinity,
+            bottomEdge: 32 + width,
+            topEdge: -32,
+            speedy: .5,
             type: 'ghost',
             update: function () {
               this.advance();
-
-              // change enemy velocity to move back and forth
-              this.x = -tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
-
-              if (this.x <= this.leftEdge) {
-                this.dx = this.speedx;
+              this.Y += this.speedy;
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY + this.Y - tileEngine.sy;
+              if (this.Y <= this.topEdge) {
+                this.speedy = Math.abs(this.speedy);
               }
-              else if (this.x >= this.rightEdge) {
-                this.dx = -this.speedx;
+              else if (this.Y >= this.bottomEdge) {
+                this.speedy = -Math.abs(this.speedy);
               }
-
-
-
-
+              if (this.speedy > 0) {
+                this.playAnimation('walk_down')
+              } else if (this.speedy < 0) {
+                this.playAnimation('walk_up')
+              }
             },
           });
         }
@@ -373,7 +541,7 @@
       });
 
       // create the player
-      var player = kontra.sprite({
+      player = kontra.sprite({
         x: 176,
         y: 88,
         speed: 1,
@@ -383,10 +551,10 @@
         update: function () {
           // create a smaller bounding box for the player's collision
           var collisionBox = {
-            y: this.y ,
-            x: this.x ,
-            width: 12,
-            height: 12
+            y: this.y + 4,
+            x: this.x + 2,
+            width: 10,
+            height: 10
           };
 
           if (kontra.keys.pressed('up')) {
@@ -480,20 +648,21 @@
           traps.update();
           Switch.update();
           sgate.update();
+          tsure.update();
           if (ghosts.getAliveObjects().length === 0) {
             spawnGhost();
           }
           quadtree.clear();
-          quadtree.add(Switch.getAliveObjects(),sgate.getAliveObjects());
+          quadtree.add(Switch.getAliveObjects(), sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), traps.getAliveObjects());
           var objects = quadtree.get(player);
           player.update();
 
           for (var i = 0, obj; obj = objects[i]; i++) {
             if (obj.type === 'switch' && obj.collidesWith(player)) {
-              if(obj.startX == 112 && obj.startY == 128){
-                if(obj.count){
+              if (obj.startX == 112 && obj.startY == 128) {
+                if (obj.count) {
                   obj.count--;
-                }else{
+                } else {
                   obj.toggle();
                   var result = sgate.objects.find(obj => {
                     return obj.startX === 80 && obj.startY == 112
@@ -502,10 +671,18 @@
                   obj.count = 30;
                 }
               }
-            }else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 0) {
-              console.log(obj)
+            } else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 0) {
+              // console.log(obj)
               return;
-          }
+            } else if ((obj.type === 'gems' || obj.type == 'gold') && obj.collidesWith(player)) {
+
+              obj.ttl = 0;
+              if (obj.type == 'gold')
+                playscore += 100;
+              if (obj.type == 'gems')
+                playscore += 200;
+              stag.innerHTML = playscore;
+            }
           }
         },
         render: function () {
@@ -516,8 +693,18 @@
           traps.render();
           Switch.render();
           sgate.render();
+          tsure.render();
         }
+
       });
+
+
+      window.gameOver = function () {
+        loop.stop();
+        stag.innerHTML = 0;
+        state.innerHTML = "Game Over !";
+      }
+
       loop.start();
     });
   </script>
