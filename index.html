@@ -25,8 +25,8 @@
 
 <body>
 
-  <canvas width="352" height="176"></canvas>
-  <!-- <canvas width="1600" height="800"></canvas> -->
+  <!-- <canvas width="352" height="176"></canvas> -->
+  <canvas width="1600" height="800"></canvas>
   <!-- <p>M - Mute</p> -->
   <script id="code">
     kontra.init();
@@ -37,7 +37,7 @@
     kontra.assets.load('terrain.json', 'man.png', 'new.png').then(function () {
       // kontra.assets.load('terrain.json', 'man.png','things.png','basictiles.png',['Digital_Forest.mp3', 'Digital_Forest.mp3']).then(function() {
       var terrain = kontra.assets.data.terrain;
-
+      var quadtree = kontra.quadtree();
       // setup tile engine
       var tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
       // tileEngine.sx = terrain.width * terrain.tilewidth / 2 - kontra.canvas.width / 2,
@@ -46,60 +46,140 @@
         tileEngine.sy = 0
 
 
-      // create the walking man sprite sheet and animations
-      var player_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          walk_up: {
-            frames: [44, 34, 24],  // frames 105 through 112
-            frameRate: 12
-          },
-          walk_left: {
-            frames: [2, 12, 22],
-            frameRate: 12
-          },
-          walk_down: {
-            frames: [10, 76, 1],
-            frameRate: 12
-          },
-          walk_right: {
-            frames: [33, 40, 41],
-            frameRate: 12
-          }
-        }
-      });
 
-      var ghosts = kontra.pool({
+      var Switch = kontra.pool({
         create: kontra.sprite,
-        maxSize: 18
+        maxSize: 3
       });
-
-
-      var ghost_animation = kontra.spriteSheet({
+      var switch_animation = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
         frameHeight: 16,
         animations: {
-          walk_up: {
-            frames: [80, 77, 67],  // frames 105 through 112
-            frameRate: 12
+          gate_open: {
+            frames: [100,101,102],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
           },
-          walk_left: {
-            frames: [16, 26, 36],
-            frameRate: 12
+          gate_close: {
+            frames: [102,101,100],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
           },
-          walk_down: {
-            frames: [60, 55, 45],
-            frameRate: 12
-          },
-          walk_right: {
-            frames: [7, 0, 75],
-            frameRate: 12
+          no_motion: {
+            frames: [100],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
           }
         }
       });
+
+      function spawnswitch() {
+        var arry = [128, 144, 736];
+        var arrx = [112, 432, 1520];
+        for (var i in arrx) {
+          var x = arrx[i], y = arry[i];
+          Switch.get({
+            x: x,
+            y: y,
+            startX: x,
+            startY: y,
+            animations: switch_animation.animations,
+            ttl: Infinity,
+            count: 30,
+            way: 1,
+            start:1,
+            type: 'switch',
+            toggle: function() {
+              if(this.way){
+                this.playAnimation('gate_open')
+                this.way =0
+              }else {
+                this.playAnimation('gate_close')
+                this.way = 1
+              }
+            },
+            update: function () {
+              this.advance();
+              if(this.start){
+                this.playAnimation('no_motion')
+                this.start = 0
+              }
+              // change enemy velocity to move back and forth
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
+            },
+          });
+        }
+      }
+      spawnswitch();
+
+      var sgate = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 2
+      });
+
+      var sgate_animation = kontra.spriteSheet({
+        image: kontra.assets.images.new,
+        frameWidth: 16,
+        frameHeight: 16,
+        animations: {
+          gate_open: {
+            frames: [48, 93, 9, 59],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          gate_close: {
+            frames: [59,9,93,48],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          no_motion: {
+            frames: [48],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          }
+        }
+      });
+
+      function spawnsGate() {
+        var arry = [112, 592,80];
+        var arrx = [80, 1072,400];
+        for (var i in arrx) {
+          var x = arrx[i], y = arry[i];
+          sgate.get({
+            x: x,
+            y: y,
+            startX: x,
+            startY: y,
+            way: 1,
+            start:1,
+            animations: sgate_animation.animations,
+            ttl: Infinity,
+            type: 'gate',
+            toggle: function() {
+              if(this.way){
+                this.playAnimation('gate_open')
+                this.way =0
+              }else {
+                this.playAnimation('gate_close')
+                this.way = 1
+              }
+            },
+            update: function () {
+              this.advance();
+              if(this.start){
+                this.playAnimation('no_motion')
+                this.start = 0
+              }
+              // change enemy velocity to move back and forth
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
+            },
+          });
+        }
+      }
+      spawnsGate();
 
       var lamps = kontra.pool({
         create: kontra.sprite,
@@ -191,7 +271,37 @@
       }
       spawnTrap();
 
-      function spawnWave() {
+      var ghosts = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 18
+      });
+
+
+      var ghost_animation = kontra.spriteSheet({
+        image: kontra.assets.images.new,
+        frameWidth: 16,
+        frameHeight: 16,
+        animations: {
+          walk_up: {
+            frames: [80, 77, 67],  // frames 105 through 112
+            frameRate: 12
+          },
+          walk_left: {
+            frames: [16, 26, 36],
+            frameRate: 12
+          },
+          walk_down: {
+            frames: [60, 55, 45],
+            frameRate: 12
+          },
+          walk_right: {
+            frames: [7, 0, 75],
+            frameRate: 12
+          }
+        }
+      });
+
+      function spawnGhost() {
         var arrx = [48];
         var arry = [192];
         var width = 16;
@@ -230,25 +340,6 @@
 
 
 
-              // if(this.dx >0 ){
-              //   this.playAnimation('walk_right');
-              // }else if(this.dx<0){
-              //   this.playAnimation('walk_left');
-              // }
-              // if(this.dy >0 ){
-              //   this.playAnimation('walk_down');
-              // }else if(this.dy<0){
-              //   this.playAnimation('walk_up');
-              // }
-              // dy: .5,
-              // else if (this.y >= thisthis.startX.bottomEdge) {
-              //   // this.dy = 0;
-              //   // this.y -= 5;
-              //   this.dy = -this.speedy;
-              // }
-              // else if (this.y <= this.topEdge) {
-              //   this.dy = this.speedy;
-              // }
 
             },
           });
@@ -256,7 +347,30 @@
       }
 
 
-
+      // create the walking man sprite sheet and animations
+      var player_animation = kontra.spriteSheet({
+        image: kontra.assets.images.new,
+        frameWidth: 16,
+        frameHeight: 16,
+        animations: {
+          walk_up: {
+            frames: [44, 34, 24],  // frames 105 through 112
+            frameRate: 12
+          },
+          walk_left: {
+            frames: [2, 12, 22],
+            frameRate: 12
+          },
+          walk_down: {
+            frames: [10, 76, 1],
+            frameRate: 12
+          },
+          walk_right: {
+            frames: [33, 40, 41],
+            frameRate: 12
+          }
+        }
+      });
 
       // create the player
       var player = kontra.sprite({
@@ -269,13 +383,16 @@
         update: function () {
           // create a smaller bounding box for the player's collision
           var collisionBox = {
-            y: this.y + 8,
-            x: this.x + 8,
-            width: 6,
-            height: 6
+            y: this.y ,
+            x: this.x ,
+            width: 12,
+            height: 12
           };
 
           if (kontra.keys.pressed('up')) {
+            if (tileEngine.layerCollidesWith('top', collisionBox)) {
+              return;
+            }
             // change the animation
             this.playAnimation('walk_up');
 
@@ -284,9 +401,6 @@
 
             // don't move the player if he collides with the collision layer
             collisionBox.y -= this.speed;
-            if (tileEngine.layerCollidesWith('top', collisionBox)) {
-              return;
-            }
 
             // player will walk in the center of the map so long as he doesn't
             // reach the edge
@@ -361,12 +475,37 @@
 
       var loop = kontra.gameLoop({
         update: function () {
-          player.update();
           ghosts.update();
           lamps.update();
           traps.update();
+          Switch.update();
+          sgate.update();
           if (ghosts.getAliveObjects().length === 0) {
-            spawnWave();
+            spawnGhost();
+          }
+          quadtree.clear();
+          quadtree.add(Switch.getAliveObjects(),sgate.getAliveObjects());
+          var objects = quadtree.get(player);
+          player.update();
+
+          for (var i = 0, obj; obj = objects[i]; i++) {
+            if (obj.type === 'switch' && obj.collidesWith(player)) {
+              if(obj.startX == 112 && obj.startY == 128){
+                if(obj.count){
+                  obj.count--;
+                }else{
+                  obj.toggle();
+                  var result = sgate.objects.find(obj => {
+                    return obj.startX === 80 && obj.startY == 112
+                  })
+                  result.toggle()
+                  obj.count = 30;
+                }
+              }
+            }else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 0) {
+              console.log(obj)
+              return;
+          }
           }
         },
         render: function () {
@@ -375,17 +514,10 @@
           ghosts.render();
           lamps.render();
           traps.render();
-
+          Switch.render();
+          sgate.render();
         }
       });
-
-      // kontra.keys.bind('m', function() {
-      //   kontra.assets.audio.Digital_Forest.muted = !kontra.assets.audio.Digital_Forest.muted;
-      // });
-
-      // kontra.assets.audio.Digital_Forest.loop = true;
-      // kontra.assets.audio.Digital_Forest.volume = 0.5;
-      // kontra.assets.audio.Digital_Forest.play();
       loop.start();
     });
   </script>
