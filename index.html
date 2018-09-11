@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tile Engine</title>
+  <style>
+    *,html,head,body {
+      margin:0;
+      padding:0;
+      border:0;
+    }
+  canvas {
+    background: black;
+    width: 1000px;
+    height: 600px;
+
+  }
+  </style>
+  <script type="text/javascript" src="kontra.js"></script>
+</head>
+<body>
+
+  <!-- <canvas width="352" height="176"></canvas> -->
+  <canvas width="1600" height="800"></canvas>
+  <!-- <p>M - Mute</p> -->
+  <script id="code">
+  kontra.init();
+
+  kontra.assets.imagePath = 'assets/';
+  kontra.assets.dataPath = 'assets/';
+
+  kontra.assets.load('terrain.json', 'man.png','new.png').then(function() {
+  // kontra.assets.load('terrain.json', 'man.png','things.png','basictiles.png',['Digital_Forest.mp3', 'Digital_Forest.mp3']).then(function() {
+    var terrain = kontra.assets.data.terrain;
+
+    // setup tile engine
+    var tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
+    // tileEngine.sx = terrain.width * terrain.tilewidth / 2 - kontra.canvas.width / 2,
+    // tileEngine.sy = terrain.height * terrain.tileheight - kontra.canvas.height
+    tileEngine.sx = 0,
+    tileEngine.sy = 0
+
+
+    // create the walking man sprite sheet and animations
+    var spritesheet = kontra.spriteSheet({
+      image: kontra.assets.images.new,
+      frameWidth: 16,
+      frameHeight: 16,
+      animations: {
+        walk_up: {
+          frames: [44,34,24],  // frames 105 through 112
+          frameRate: 12
+        },
+        walk_left: {
+          frames: [2,12,22],
+          frameRate: 12
+        },
+        walk_down: {
+          frames: [10,76,1],
+          frameRate: 12
+        },
+        walk_right: {
+          frames: [33,40,41],
+          frameRate: 12
+        }
+      }
+    });
+
+    // create the player
+    var player = kontra.sprite({
+      x: 176,
+      y: 88,
+      speed: 1,
+      startX: 176,
+      startY: 88,
+      animations: spritesheet.animations,
+      update: function() {
+        // create a smaller bounding box for the player's collision
+        var collisionBox = {
+          y: this.y + 8,
+          x: this.x + 8,
+          width: 6,
+          height: 6
+        };
+
+        if (kontra.keys.pressed('up')) {
+          // change the animation
+          this.playAnimation('walk_up');
+
+          // update the animation
+          this.advance();
+
+          // don't move the player if he collides with the collision layer
+          collisionBox.y -= this.speed;
+          if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            return;
+          }
+
+          // player will walk in the center of the map so long as he doesn't
+          // reach the edge
+          if (tileEngine.sy > 0 && this.y <= this.startY) {
+            tileEngine.sy -= this.speed;
+          }
+          // otherwise the map will stop moving and the player will move from
+          // the center
+          else {
+            this.y -= this.speed;
+          }
+        }
+
+        else if (kontra.keys.pressed('down')) {
+          this.playAnimation('walk_down');
+
+          this.advance();
+
+          collisionBox.y += this.speed;
+          if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            return;
+          }
+          console.log(tileEngine.mapHeight)
+          console.log(kontra.canvas.height)
+          console.log(tileEngine.sy < tileEngine.mapHeight - kontra.canvas.height)
+          console.log(this.y)
+          console.log(this.startY)
+          if (tileEngine.sy < tileEngine.mapHeight - kontra.canvas.height &&
+              this.y >= this.startY) {
+            tileEngine.sy += this.speed;
+          }
+          else {
+            this.y += this.speed;
+          }
+        }
+
+        else if (kontra.keys.pressed('left')) {
+          this.playAnimation('walk_left');
+
+          this.advance();
+
+          collisionBox.x -= this.speed;
+          if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            return;
+          }
+
+          if (tileEngine.sx > 0 && this.x <= this.startX) {
+            tileEngine.sx -= this.speed;
+          }
+          else {
+            this.x -= this.speed;
+          }
+        }
+
+        else if (kontra.keys.pressed('right')) {
+          this.playAnimation('walk_right');
+
+          this.advance();
+
+          collisionBox.x += this.speed;
+          if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            return;
+          }
+
+          if (tileEngine.sx < tileEngine.mapWidth - kontra.canvas.width &&
+              this.x >= this.startX) {
+            tileEngine.sx += this.speed;
+          }
+          else {
+            this.x += this.speed;
+          }
+        }
+      },
+    });
+
+    // clamp player position in the game world
+    player.position.clamp(0, 0, kontra.canvas.width-player.width, kontra.canvas.height - player.height);
+
+    var loop = kontra.gameLoop({
+      update: function() {
+        player.update();
+      },
+      render: function() {
+        tileEngine.render();
+        player.render();
+
+      }
+    });
+
+    // kontra.keys.bind('m', function() {
+    //   kontra.assets.audio.Digital_Forest.muted = !kontra.assets.audio.Digital_Forest.muted;
+    // });
+
+    // kontra.assets.audio.Digital_Forest.loop = true;
+    // kontra.assets.audio.Digital_Forest.volume = 0.5;
+    // kontra.assets.audio.Digital_Forest.play();
+    loop.start();
+  });
+  </script>
+</body>
+</html>
