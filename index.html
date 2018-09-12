@@ -41,9 +41,6 @@
       cursor: pointer;
     }
 
-    #{
- color: #4CAF50;
-    }
   </style>
   <script type="text/javascript" src="kontra.js"></script>
 </head>
@@ -204,7 +201,7 @@
 
       var sgate = kontra.pool({
         create: kontra.sprite,
-        maxSize: 2
+        maxSize: 3
       });
 
       var sgate_animation = kontra.spriteSheet({
@@ -585,22 +582,12 @@
             if (tileEngine.layerCollidesWith('top', collisionBox)) {
               return;
             }
-            // change the animation
             this.playAnimation('walk_up');
-
-            // update the animation
             this.advance();
-
-            // don't move the player if he collides with the collision layer
             collisionBox.y -= this.speed;
-
-            // player will walk in the center of the map so long as he doesn't
-            // reach the edge
             if (tileEngine.sy > 0 && this.y <= this.startY) {
               tileEngine.sy -= this.speed;
             }
-            // otherwise the map will stop moving and the player will move from
-            // the center
             else {
               this.y -= this.speed;
             }
@@ -684,18 +671,26 @@
 
           for (var i = 0, obj; obj = objects[i]; i++) {
             if (obj.type === 'switch' && obj.collidesWith(player)) {
-              if (obj.startX == 112 && obj.startY == 128) {
                 if (obj.count) {
                   obj.count--;
                 } else {
                   obj.toggle();
-                  var result = sgate.objects.find(obj => {
+                  var result = {toggle: function(){}}
+                  if (obj.startX == 112 && obj.startY == 128)
+                  result = sgate.objects.find(obj => {
                     return obj.startX === 80 && obj.startY == 112
                   })
+                  else if (obj.startX == 432 && obj.startY == 144)
+                    result = sgate.objects.find(obj => {
+                      return obj.startX === 400 && obj.startY == 80
+                    })
+                  else if (obj.startX == 1520 && obj.startY == 736)
+                    result = sgate.objects.find(obj => {
+                      return obj.startX === 1072 && obj.startY == 592
+                    })
                   result.toggle()
                   obj.count = 30;
                 }
-              }
             } else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 1) {
               player.y +=player.speed;
               return;
@@ -709,7 +704,6 @@
               stag.innerHTML = playscore;
 
             } else if (obj.type == 'ghost' && obj.collidesWith(player)) {
-              console.log(obj)
               player.playAnimation('dead');
               gameOver();
             }
