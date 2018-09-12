@@ -541,6 +541,10 @@
 
 
       // create the walking man sprite sheet and animations
+      var princess = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 1
+      });
       var player_animation = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
@@ -565,11 +569,36 @@
           dead: {
             frames: [11],
             frameRate: 12
+          },
+          princess: {
+            frames: [10,1],
+            frameRate: 3
           }
         }
       });
 
-      // create the player
+        princess.get({
+            x: 1072,
+            y: 354,
+            startX: 1072,
+            startY: 384,
+            time: 0,
+            animations: player_animation.animations,
+            ttl: Infinity,
+            type: 'princess',
+            update: function () {
+              this.advance();
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
+              if(this.time == 0){
+                this.playAnimation('princess')
+                this.time = 60
+              }
+              else {
+                this.time--
+              }
+            }
+          });
       player = kontra.sprite({
         x: 176,
         y: 88,
@@ -702,16 +731,21 @@
           sgate.update();
           tsure.update();
           spider.update();
+          princess.update();
 
           if (ghosts.getAliveObjects().length === 0) {
             spawnGhost();
           }
           quadtree.clear();
-          quadtree.add(Switch.getAliveObjects(), sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects());
+          quadtree.add(Switch.getAliveObjects(), princess.getAliveObjects(),sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects());
           var objects = quadtree.get(player);
 
           for (var i = 0, obj; obj = objects[i]; i++) {
-            if (obj.type === 'switch' && obj.collidesWith(player)) {
+            if(obj.type === 'princess' && obj.collidesWith(player)) {
+              loop.stop();
+              alert("Hurrayyy, you saved our dear princess:)");
+
+            }else if (obj.type === 'switch' && obj.collidesWith(player)) {
                 if (obj.count) {
                   obj.count--;
                 } else {
@@ -783,6 +817,8 @@
           sgate.render();
           tsure.render();
           spider.render();
+          princess.render();
+
         }
 
       });
