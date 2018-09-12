@@ -1,5 +1,4 @@
 <head>
-  <title>Tile Engine</title>
   <style>
     * {
       margin: 0;
@@ -10,7 +9,7 @@
       background-color: black;
     }
 
-    div#float {
+    div#f {
       color: white;
       float: right;
       margin: 40px;
@@ -21,25 +20,20 @@
       background: black;
       width: 1100px;
       height: 600px;
-
     }
 
     button {
       background-color: #4CAF50;
-      /* Green */
-      display:none;
       padding: 15px 32px;
       text-align: center;
-      margin-top: 20px;
-      cursor: pointer;
     }
-    .name {
-      margin-top: 5px;
-      margin-bottom: 5px;
+    .n {
+      margin-top: 4px;
+      margin-bottom: 4px;
     }
 
     .c{
-      font-size: 20px;
+      font-size: 18px;
       color: white;
     }
     .ins {
@@ -49,50 +43,47 @@
       border: white solid 2px;
       bottom :40px;
     }
+    #s {margin-top:100px}
 
   </style>
-  <script type="text/javascript" src="kontra.min.js"></script>
+  <script src="kontra.min.js"></script>
 </head>
 
 <body>
 
-  <div class="name c">Adventure Time: Save Princess</div>
-  <!-- <canvas width="352" height="176"></canvas> -->
-  <canvas width="1120" height="560"></canvas>
+  <div class="n c">Adventure Time: Save Princess</div>
+  <canvas width="352" height="176"></canvas>
 
-  <div id="float">
+  <div id="f">
     <div class="c">Score:
       <span id="score">0</span>
     </div>
     <button id="b" class="c" onclick="location.reload()">Restart</button>
-    <div id="state">Game Started</div>
+    <div id="s">Game Started</div>
   </div>
   <div class="ins c">Mute: m</div>
   <script>
-    kontra.init();
-    var playscore = 0, stag = document.getElementById('score'), state = document.getElementById('state');
+    kon.init();
+    var playscore = 0, stag = document.getElementById('score'), s = document.getElementById('s');
 
 
-    kontra.assets.imagePath = 'assets/';
-    kontra.assets.dataPath = 'assets/';
-    setTimeout(function () {
-      state.innerHTML = "";
-      document.getElementById('b').style.display = "inline-block";
-    }, 2000);
+    kon.assets.imagePath = 'assets/';
+    kon.assets.dataPath = 'assets/';
+    setTimeout(function () {s.innerHTML = "";}, 2000);
 
-    kontra.assets.load('terrain.json','new.png').then(function () {
-      var terrain = kontra.assets.data.terrain;
-      var quadtree = kontra.quadtree();
-      tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
-      tileEngine.sx = 0,
-        tileEngine.sy = 0
+    kon.assets.load('terrain.json','new.png').then(function () {
+      var terrain = kon.assets.data.terrain;
+      var quadtree = kon.quadtree();
+      teg = kon.teg(kon.assets.data.terrain);
+      teg.sx = 0,
+        teg.sy = 0
 
 
-      var ani = kontra.spriteSheet({
-        image: kontra.assets.images.new,
+      var ani = kon.spriteSheet({
+        image: kon.assets.images.new,
         frameWidth: 16,
         frameHeight: 16,
-        animations: {
+        anim: {
           d: {
             frames: [90],  // frames 105 through 112
             frameRate: 3,
@@ -145,10 +136,6 @@
             frames: [81, 82, 83],
             frameRate: 12
           },
-          l: {
-            frames: [107, 108, 109],  // frames 105 through 112
-            frameRate: .1
-          },
           r : {
             frames: [15],  // frames 105 through 112
             frameRate: 6
@@ -177,61 +164,59 @@
             frames: [10,1],
             frameRate: 3
           },
-          gwu: {
+          ghu: {
             frames: [80, 77, 67],  // frames 105 through 112
-            frameRate: 12
+            frameRate: 6
           },
           gwl: {
             frames: [16, 26, 36],
-            frameRate: 12
+            frameRate: 6
           },
-          gwd: {
+          ghd: {
             frames: [60, 55, 45],
-            frameRate: 12
+            frameRate: 6
           },
           gwr: {
             frames: [7, 0, 75],
-            frameRate: 12
+            frameRate: 6
           }
         }
       });
 
-      var tsure = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 210
+      var tsure = kon.pool({
+        create: kon.sprite,
+        maxSize: 170
       });
-      var sgate = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 3
-      });
+      // var tsure = kon.pool({
+      //   create: kon.sprite,
+      //   maxSize: 3
+      // });
       function spawnTsure() {
         //teasure
         var arry = [0, 0, 0, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 32, 32, 48, 48, 48, 64, 64, 64, 80, 80, 80, 80, 80, 112, 112, 128, 128, 128, 144, 144, 144, 144, 160, 160,208, 208, 208, 208, 224, 224, 240, 240, 240, 256, 256, 272, 272, 272, 288, 320, 320, 320, 320, 320, 336, 336, 336, 352, 352, 352, 352, 352, 368, 368, 368, 384, 384,416, 432, 432, 448, 464, 480, 480, 480, 480, 496, 496, 512, 512, 512, 528, 528, 544, 544];
         var arrx = [720, 768, 816, 432, 464, 736, 768, 784, 832, 352, 368, 384, 448, 496, 720, 768, 816, 352, 368, 384, 64, 80, 96, 64, 80, 96, 688, 704, 496, 512, 256, 272, 512, 256,272, 496, 512, 256, 272, 336, 640, 672, 704, 304, 720, 320, 368, 688, 320, 368, 624, 656, 688, 704, 176, 208, 240, 624, 672, 192, 224, 704, 176, 208, 240, 480, 848,192, 224, 832, 496, 848, 480, 1008, 1088, 1040, 1008, 576, 640, 688, 1056, 608, 1024, 16, 656, 688, 48, 512, 16, 80];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          var type = ['d', 'g'];
-          var type = type[Math.floor(Math.random() * 2)]
           tsure.get(function (types) {
             return {
               x: x,
               y: y,
               startX: x,
               startY: y,
-              animations: ani.animations,
+              anim: ani.anim,
               ttl: Infinity,
               type: types,
               way: 1,
               update: function () {
                 if (this.way == 1) {
-                  this.playAnimation(types)
+                  this.pAni(types)
                   this.way = 0
                 }
-                this.x = this.startX - tileEngine.sx;
-                this.y = this.startY - tileEngine.sy;
+                this.x = this.startX - teg.sx;
+                this.y = this.startY - teg.sy;
               }
             }
-          }(type));
+          }(['d', 'g'][Math.floor(Math.random() * 2)]));
         }
         // switch
         arry = [144, 144, 512];
@@ -243,7 +228,7 @@
             y: y,
             startX: x,
             startY: y,
-            animations: ani.animations,
+            anim: ani.anim,
             ttl: Infinity,
             count: 30,
             way: 1,
@@ -251,22 +236,22 @@
             type: 's',
             toggle: function () {
               if (this.way) {
-                this.playAnimation('so')
+                this.pAni('so')
                 this.way = 0
               } else {
-                this.playAnimation('sc')
+                this.pAni('sc')
                 this.way = 1
               }
             },
             update: function () {
-              this.advance();
+              this.adv();
               if (this.s) {
-                this.playAnimation('sd')
+                this.pAni('sd')
                 this.s = 0
               }
               // change enemy velocity to move back and forth
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
+              this.x = this.startX - teg.sx;
+              this.y = this.startY - teg.sy;
             },
           });
         }
@@ -275,56 +260,34 @@
         arrx = [400, 80, 672];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          sgate.get({
+          tsure.get({
             x: x,
             y: y,
             startX: x,
             startY: y,
             way: 1,
             start: 1,
-            animations: ani.animations,
+            anim: ani.anim,
             ttl: Infinity,
             type: 'gt',
             toggle: function () {
               if (this.way) {
-                this.playAnimation('go')
+                this.pAni('go')
                 this.way = 0
               } else {
-                this.playAnimation('gc')
+                this.pAni('gc')
                 this.way = 1
               }
             },
             update: function () {
-              this.advance();
+              this.adv();
               if (this.start) {
-                this.playAnimation('gd')
+                this.pAni('gd')
                 this.start = 0
               }
               // change enemy velocity to move back and forth
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
-            },
-          });
-        }
-        // lamp
-        var arry = [48, 48, 96, 96, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 208, 224, 240, 240, 240, 240, 240, 256, 256, 272, 272, 288, 288, 304, 304, 320, 320, 336, 336, 352, 352, 368, 368, 368, 368, 368, 368, 384];
-        var arrx = [48, 112, 48, 112, 608, 624, 640, 656, 672, 688, 704, 720, 736, 752, 768, 784, 608, 784, 608, 736, 752, 768, 784, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 624, 640, 704, 720, 736, 368];
-        for (var i in arrx) {
-          var x = arrx[i], y = arry[i];
-          tsure.get({
-            x: x,
-            y: y,
-            startX: x,
-            startY: y,
-            animations: ani.animations,
-            ttl: Infinity,
-            w:1,
-            type: 'l',
-            update: function () {
-              this.advance();
-              if(this.w == 1){this.playAnimation('l');this.w--;}
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
+              this.x = this.startX - teg.sx;
+              this.y = this.startY - teg.sy;
             },
           });
         }
@@ -339,59 +302,24 @@
             startX: x,
             startY: y,
             w:1,
-            animations: ani.animations,
+            anim: ani.anim,
             ttl: Infinity,
             type: 't',
             update: function () {
-              this.advance();
-              if(this.w == 1){this.playAnimation('t');
+              this.adv();
+              if(this.w == 1){this.pAni('t');
               this.w--;}
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
+              this.x = this.startX - teg.sx;
+              this.y = this.startY - teg.sy;
             },
           });
         }
-        // spider
-        arrY = [16, 16, 16, 160, 240, 272, 320, 464, 480, 528, 528];
-        arrX = [752, 800, 848, 1040, 720, 336, 1088, 544, 976, 304, 368];
-        for (var i in arrX) {
-          var x = arrX[i], y = arrY[i];
-          tsure.get({
-            x: x,
-            y: y,
-            Y: 0,
-            startX: x,
-            startY: y,
-            animations: ani.animations,
-            ttl: Infinity,
-            bottomEdge: 32 + 16,
-            topEdge: -32,
-            speedy: .5,
-            type: 'gh',
-            update: function () {
-              this.advance();
-              this.Y += this.speedy;
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY + this.Y - tileEngine.sy;
-              if (this.Y <= this.topEdge) {
-                this.speedy = Math.abs(this.speedy);
-              }
-              else if (this.Y >= this.bottomEdge) {
-                this.speedy = -Math.abs(this.speedy);
-              }
-              if (this.speedy > 0) {
-                this.playAnimation('swd')
-              } else if (this.speedy < 0) {
-                this.playAnimation('swu')
-              }
-            },
-          });
-        }
+
         // ghost
         arry = [160, 192, 224, 224, 240, 256, 304, 368, 432];
         arrx = [944, 64, 496, 992, 656, 1072, 656, 96, 784];
-        var arrY = [96, 96, 128, 208, 208, 240, 400, 496, 512, 544];
-        var arrX = [736, 800, 544, 288, 384, 192, 32, 432, 208, 464];
+        var arrY = [96, 96, 128, 208, 208, 240, 400, 496, 512, 544,16, 16, 16, 160, 240, 272, 320, 464, 480, 528, 528];
+        var arrX = [736, 800, 544, 288, 384, 192, 32, 432, 208, 464, 752, 800, 848, 1040, 720, 336, 1088, 544, 976, 304, 368];
 
         // var funarr = [horver,]
         for (var i in arrx) {
@@ -402,18 +330,18 @@
             X: 0,
             startX: x,
             startY: y,
-            animations: ani.animations,
+            anim: ani.anim,
             ttl: Infinity,
             leftEdge: -32,
             rightEdge: 32 + 16,
-            speedx: .5,
+            speedx: .3,
             type: 'gh',
             update: function () {
-              this.advance();
+              this.adv();
 
               this.X += this.speedx;
-              this.x = this.startX + this.X - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
+              this.x = this.startX + this.X - teg.sx;
+              this.y = this.startY - teg.sy;
               if (this.X <= this.leftEdge) {
                 this.speedx = Math.abs(this.speedx);
               }
@@ -421,32 +349,33 @@
                 this.speedx = -Math.abs(this.speedx);
               }
               if (this.speedx > 0) {
-                this.playAnimation('gwr')
+                this.pAni('gwr')
               } else if (this.speedx < 0) {
-                this.playAnimation('gwl')
+                this.pAni('gwl')
               }
             },
           });
         }
         for (var i in arrX) {
           var x = arrX[i], y = arrY[i];
-          tsure.get({
+          tsure.get(function (tt){
+            return {
             x: x,
             y: y,
             Y: 0,
             startX: x,
             startY: y,
-            animations: ani.animations,
+            anim: ani.anim,
             ttl: Infinity,
             bottomEdge: 32 + 16,
             topEdge: -32,
-            speedy: .5,
+            speedy: .3,
             type: 'gh',
             update: function () {
-              this.advance();
+              this.adv();
               this.Y += this.speedy;
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY + this.Y - tileEngine.sy;
+              this.x = this.startX - teg.sx;
+              this.y = this.startY + this.Y - teg.sy;
               if (this.Y <= this.topEdge) {
                 this.speedy = Math.abs(this.speedy);
               }
@@ -454,12 +383,13 @@
                 this.speedy = -Math.abs(this.speedy);
               }
               if (this.speedy > 0) {
-                this.playAnimation('gwd')
+                this.pAni(tt + 'd')
               } else if (this.speedy < 0) {
-                this.playAnimation('gwu')
+                this.pAni(tt + 'u')
               }
-            },
-          });
+            }
+          }
+          }(['sw', 'gh'][Math.floor(Math.random() * 2)]));
         }
         arry = [208, 224, 480, 112];
         arrx = [784, 608, 992, 976];
@@ -473,15 +403,15 @@
             way:1,
             ttl: Infinity,
             type: 'r',
-            animations: ani.animations,
+            anim: ani.anim,
             update: function () {
-              // this.advance();
+              // this.adv();
               if(this.way){
-                this.playAnimation('r');
+                this.pAni('r');
                 this.way=0;
               }
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
+              this.x = this.startX - teg.sx;
+              this.y = this.startY - teg.sy;
             }
           });
         }
@@ -495,15 +425,15 @@
             startX: 752,
             startY: 208,
             time: 0,
-            animations: ani.animations,
+            anim: ani.anim,
             ttl: Infinity,
             type: 'ps',
             update: function () {
-              this.advance();
-              this.x = this.startX - tileEngine.sx;
-              this.y = this.startY - tileEngine.sy;
+              this.adv();
+              this.x = this.startX - teg.sx;
+              this.y = this.startY - teg.sy;
               if(this.time == 0){
-                this.playAnimation('ps')
+                this.pAni('ps')
                 this.time = 60
               }
               else {
@@ -511,88 +441,87 @@
               }
             }
           });
-      player = kontra.sprite({
+      player = kon.sprite({
         x: 176,
         y: 88,
-        speed: 1,
+        speed: .5,
         startX: 176,
         startY: 88,
         w:1,
-        animations: ani.animations,
+        anim: ani.anim,
         update: function () {
           // create a smaller bounding box for the player's collision
-          if(this.w){this.w=0;this.playAnimation('wd')}
+          if(this.w){this.w=0;this.pAni('wd')}
           var collisionBox = {
             y: this.y + 4,
             x: this.x + 2,
             width: 10,
             height: 10
           };
-
-          if (kontra.keys.pressed('up')) {
-            if (tileEngine.layerCollidesWith('top', collisionBox)) {
+          if (kon.keys.pressed('up')) {
+            if (teg.layercWi('top', collisionBox)) {
               return;
             }
-            this.playAnimation('wu');
-            this.advance();
+            this.pAni('wu');
+            this.adv();
             collisionBox.y -= this.speed;
-            if (tileEngine.sy > 0 && this.y <= this.startY) {
-              tileEngine.sy -= this.speed;
+            if (teg.sy > 0 && this.y <= this.startY) {
+              teg.sy -= this.speed;
             }
             else {
               this.y -= this.speed;
             }
           }
 
-          else if (kontra.keys.pressed('down')) {
-            this.playAnimation('wd');
+          else if (kon.keys.pressed('down')) {
+            this.pAni('wd');
 
-            this.advance();
+            this.adv();
 
             collisionBox.y += this.speed;
-            if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            if (teg.layercWi('top', collisionBox)) {
               return;
             }
-            if (tileEngine.sy < tileEngine.mapHeight - kontra.canvas.height &&
+            if (teg.sy < teg.mapHeight - kon.canvas.height &&
               this.y >= this.startY) {
-              tileEngine.sy += this.speed;
+              teg.sy += this.speed;
             }
             else {
               this.y += this.speed;
             }
           }
 
-          else if (kontra.keys.pressed('left')) {
-            this.playAnimation('wl');
+          else if (kon.keys.pressed('left')) {
+            this.pAni('wl');
 
-            this.advance();
+            this.adv();
 
             collisionBox.x -= this.speed;
-            if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            if (teg.layercWi('top', collisionBox)) {
               return;
             }
 
-            if (tileEngine.sx > 0 && this.x <= this.startX) {
-              tileEngine.sx -= this.speed;
+            if (teg.sx > 0 && this.x <= this.startX) {
+              teg.sx -= this.speed;
             }
             else {
               this.x -= this.speed;
             }
           }
 
-          else if (kontra.keys.pressed('right')) {
-            this.playAnimation('wr');
+          else if (kon.keys.pressed('right')) {
+            this.pAni('wr');
 
-            this.advance();
+            this.adv();
 
             collisionBox.x += this.speed;
-            if (tileEngine.layerCollidesWith('top', collisionBox)) {
+            if (teg.layercWi('top', collisionBox)) {
               return;
             }
 
-            if (tileEngine.sx < tileEngine.mapWidth - kontra.canvas.width &&
+            if (teg.sx < teg.mapWidth - kon.canvas.width &&
               this.x >= this.startX) {
-              tileEngine.sx += this.speed;
+              teg.sx += this.speed;
             }
             else {
               this.x += this.speed;
@@ -600,17 +529,17 @@
           }
         },
       });
-      const context = new AudioContext();
+      const context = new (window.AudioContext || window.webkitAudioContext)();
       function NotesGenerator() {
         this.playNote = function(v) {
           const oscillator = context.createOscillator();
 
-          const waveForm = Math.random() > 0.5 ? "sine" : "triangle";
-          oscillator.type = waveForm;
+          // const waveForm = Math.random() > 0.5 ? "sine" : "triangle";
+          oscillator.type = "sine";
           oscillator.frequency.value = v;
 
           const gainNode = context.createGain();
-          gainNode.gain.value = 0.2;
+          gainNode.gain.value = 0.4;
 
           // generate sound
           oscillator.connect(gainNode);
@@ -630,22 +559,22 @@
       }
 
       // clamp player position in the game world
-      player.position.clamp(0, 0, kontra.canvas.width - player.width, kontra.canvas.height - player.height);
+      player.position.clamp(0, 0, kon.canvas.width - player.width, kon.canvas.height - player.height);
 
       let notesGenerator = new NotesGenerator(), frames = 60, v=0, muted = 0 ;
       var nextNote = [196,65.5,496,588,880,440,588,98,165,660,392,330,165,392,123.5,524,349];
 
-      var loop = kontra.gameLoop({
+      var loop = kon.gameLoop({
         update: function () {
           tsure.update();
-          sgate.update();
+          tsure.update();
 
           quadtree.clear();
           quadtree.add(tsure.getAliveObjects());
           var objects = quadtree.get(player);
 
           for (var i = 0, obj; obj = objects[i]; i++) {
-            if (obj.type === 'r' && obj.collidesWith(player)){
+            if (obj.type === 'r' && obj.cWi(player)){
               var blocksize = 20, sign =1,x,y,dx = 112,dy=112;
 
               if (obj.startX == 784 && obj.startY == 208){
@@ -661,40 +590,41 @@
               }
               player.x = dx + sign*blocksize;
               player.y = dy + sign*blocksize;
-              tileEngine.sx = x - 112;
-              tileEngine.sy = y - 112;
+              teg.sx = x - 112;
+              teg.sy = y - 112;
 
 
-            }else if(obj.type === 'ps' && obj.collidesWith(player)) {
+            }else if(obj.type === 'ps' && obj.cWi(player)) {
               loop.stop();
-              alert("Hurrayyy, you saved our dear princess:)");
+              alert("Hurray, you princess!");
 
-            }else if (obj.type === 's' && obj.collidesWith(player)) {
+            }else if (obj.type === 's' && obj.cWi(player)) {
                 if (obj.count) {
                   obj.count--;
                 } else {
                   obj.toggle();
                   var result = {toggle: function(){}}
                   if (obj.startX == 112 && obj.startY == 144)
-                  result = sgate.objects.find(obj => {
+                  result = tsure.objects.find(obj => {
                     return obj.startX === 80 && obj.startY == 112
                   })
                   else if (obj.startX == 432 && obj.startY == 144)
-                    result = sgate.objects.find(obj => {
+                    result = tsure.objects.find(obj => {
                       return obj.startX === 400 && obj.startY == 80
                     })
                   else if (obj.startX == 960 && obj.startY == 512)
-                    result = sgate.objects.find(obj => {
+                    result = tsure.objects.find(obj => {
                       return obj.startX === 672 && obj.startY == 416
                     })
 
                   result.toggle()
                   obj.count = 30;
                 }
-            } else if (obj.type === 'gt' && obj.collidesWith(player) && obj.way == 1) {
+            } else if (obj.type === 'gt' && obj.cWi(player) && obj.way == 1) {
               player.y +=player.speed;
+              console.log(obj)
               return;
-            } else if ((obj.type === 'd' || obj.type == 'g') && obj.collidesWith(player)) {
+            } else if ((obj.type === 'd' || obj.type == 'g') && obj.cWi(player)) {
               var o = context.createOscillator()
               var  g = context.createGain()
               o.connect(g)
@@ -713,8 +643,8 @@
                 playscore += 200;
               stag.innerHTML = playscore;
 
-            } else if ((obj.type == 'gh' || obj.type == 't') && obj.collidesWith(player)) {
-              player.playAnimation('dd');
+            } else if ((obj.type == 'gh' || obj.type == 't') && obj.cWi(player)) {
+              player.pAni('dd');
               gameOver();
             }
           }
@@ -732,10 +662,10 @@
 
         },
         render: function () {
-          tileEngine.render();
+          teg.render();
           player.render();
           tsure.render();
-          sgate.render();
+          tsure.render();
         }
 
       });
@@ -744,12 +674,12 @@
       window.gameOver = function () {
         loop.stop();
         stag.innerHTML = 0;
-        state.innerHTML = "Game Over !";
+        s.innerHTML = "GameOver";
       }
 
       loop.start();
 
-       kontra.keys.bind('m', function() {
+       kon.keys.bind('m', function() {
           muted = muted == 0 ? 1 : 0;
       });
     });
