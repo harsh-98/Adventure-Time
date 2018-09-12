@@ -111,7 +111,6 @@
           var x = arrx[i], y = arry[i];
           var type = ['gold', 'gems'];
           var type = type[Math.floor(Math.random() * 2)]
-          console.log(type);
           tsure.get(function (types) {
             return {
               x: x,
@@ -380,11 +379,11 @@
             frameRate: 12
           },
           walk_left: {
-            frames: [17,27,37],
+            frames: [17, 27, 37],
             frameRate: 12
           },
           walk_up: {
-            frames: [81,82,83],
+            frames: [81, 82, 83],
             frameRate: 12
           }
         }
@@ -675,13 +674,13 @@
           sgate.update();
           tsure.update();
           spider.update();
+
           if (ghosts.getAliveObjects().length === 0) {
             spawnGhost();
           }
           quadtree.clear();
           quadtree.add(Switch.getAliveObjects(), sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects());
           var objects = quadtree.get(player);
-          player.update();
 
           for (var i = 0, obj; obj = objects[i]; i++) {
             if (obj.type === 'switch' && obj.collidesWith(player)) {
@@ -697,8 +696,8 @@
                   obj.count = 30;
                 }
               }
-            } else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 0) {
-              // console.log(obj)
+            } else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 1) {
+              player.y +=player.speed;
               return;
             } else if ((obj.type === 'gems' || obj.type == 'gold') && obj.collidesWith(player)) {
 
@@ -708,11 +707,14 @@
               if (obj.type == 'gems')
                 playscore += 200;
               stag.innerHTML = playscore;
-            }else if(obj.type = 'ghost' && obj.collidesWith(player)){
+
+            } else if (obj.type == 'ghost' && obj.collidesWith(player)) {
+              console.log(obj)
               player.playAnimation('dead');
               gameOver();
             }
           }
+          player.update();
         },
         render: function () {
           tileEngine.render();
