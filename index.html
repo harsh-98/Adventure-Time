@@ -73,7 +73,7 @@
 
     kon.assets.load('terrain.json','new.png').then(function () {
       var terrain = kon.assets.data.terrain;
-      var quadtree = kon.quadtree();
+      var qtree = kon.qtree();
       teg = kon.teg(kon.assets.data.terrain);
       teg.sx = 0,
         teg.sy = 0
@@ -530,7 +530,7 @@
         },
       });
       const context = new (window.AudioContext || window.webkitAudioContext)();
-      function NotesGenerator() {
+      function N() {
         this.playNote = function(v) {
           const oscillator = context.createOscillator();
 
@@ -561,7 +561,7 @@
       // clamp player position in the game world
       player.position.clamp(0, 0, kon.canvas.width - player.width, kon.canvas.height - player.height);
 
-      let notesGenerator = new NotesGenerator(), frames = 60, v=0, muted = 0 ;
+      let notesGenerator = new N(), frames = 60, v=0, muted = 0 ;
       var nextNote = [196,65.5,496,588,880,440,588,98,165,660,392,330,165,392,123.5,524,349];
 
       var loop = kon.gameLoop({
@@ -569,9 +569,9 @@
           tsure.update();
           tsure.update();
 
-          quadtree.clear();
-          quadtree.add(tsure.getAliveObjects());
-          var objects = quadtree.get(player);
+          qtree.clear();
+          qtree.add(tsure.gAO());
+          var objects = qtree.get(player);
 
           for (var i = 0, obj; obj = objects[i]; i++) {
             if (obj.type === 'r' && obj.cWi(player)){
