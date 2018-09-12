@@ -57,8 +57,8 @@
 <body>
 
   <div class="name c">Adventure Time: Save Princess</div>
-  <canvas width="352" height="176"></canvas>
-  <!-- <canvas width="1120" height="560"></canvas> -->
+  <!-- <canvas width="352" height="176"></canvas> -->
+  <canvas width="1120" height="560"></canvas>
 
   <div id="float">
     <div class="c">Score:
@@ -87,10 +87,7 @@
       tileEngine.sx = 0,
         tileEngine.sy = 0
 
-      var tsure = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 90
-      });
+
       var ani = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
@@ -199,7 +196,16 @@
         }
       });
 
+      var tsure = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 210
+      });
+      var sgate = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 3
+      });
       function spawnTsure() {
+        //teasure
         var arry = [0, 0, 0, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 32, 32, 48, 48, 48, 64, 64, 64, 80, 80, 80, 80, 80, 112, 112, 128, 128, 128, 144, 144, 144, 144, 160, 160,208, 208, 208, 208, 224, 224, 240, 240, 240, 256, 256, 272, 272, 272, 288, 320, 320, 320, 320, 320, 336, 336, 336, 352, 352, 352, 352, 352, 368, 368, 368, 384, 384,416, 432, 432, 448, 464, 480, 480, 480, 480, 496, 496, 512, 512, 512, 528, 528, 544, 544];
         var arrx = [720, 768, 816, 432, 464, 736, 768, 784, 832, 352, 368, 384, 448, 496, 720, 768, 816, 352, 368, 384, 64, 80, 96, 64, 80, 96, 688, 704, 496, 512, 256, 272, 512, 256,272, 496, 512, 256, 272, 336, 640, 672, 704, 304, 720, 320, 368, 688, 320, 368, 624, 656, 688, 704, 176, 208, 240, 624, 672, 192, 224, 704, 176, 208, 240, 480, 848,192, 224, 832, 496, 848, 480, 1008, 1088, 1040, 1008, 576, 640, 688, 1056, 608, 1024, 16, 656, 688, 48, 512, 16, 80];
         for (var i in arrx) {
@@ -227,19 +233,12 @@
             }
           }(type));
         }
-      }
-      spawnTsure();
-
-      var Switch = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 3
-      });
-      function spawnswitch() {
-        var arry = [144, 144, 512];
-        var arrx = [112, 432, 960];
+        // switch
+        arry = [144, 144, 512];
+        arrx = [112, 432, 960];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          Switch.get({
+          tsure.get({
             x: x,
             y: y,
             startX: x,
@@ -271,18 +270,9 @@
             },
           });
         }
-      }
-      spawnswitch();
-
-      var sgate = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 3
-      });
-
-
-      function spawnsGate() {
-        var arry = [80, 112, 416];
-        var arrx = [400, 80, 672];
+        // gate
+        arry = [80, 112, 416];
+        arrx = [400, 80, 672];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           sgate.get({
@@ -316,20 +306,12 @@
             },
           });
         }
-      }
-      spawnsGate();
-
-      var lamps = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 44
-      });
-
-      function spawnLamp() {
+        // lamp
         var arry = [48, 48, 96, 96, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 208, 224, 240, 240, 240, 240, 240, 256, 256, 272, 272, 288, 288, 304, 304, 320, 320, 336, 336, 352, 352, 368, 368, 368, 368, 368, 368, 384];
         var arrx = [48, 112, 48, 112, 608, 624, 640, 656, 672, 688, 704, 720, 736, 752, 768, 784, 608, 784, 608, 736, 752, 768, 784, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 624, 640, 704, 720, 736, 368];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          lamps.get({
+          tsure.get({
             x: x,
             y: y,
             startX: x,
@@ -346,20 +328,12 @@
             },
           });
         }
-      }
-      spawnLamp();
-
-      var traps = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 26
-      });
-
-      function spawnTrap() {
-        var arry = [112, 112, 128, 128, 144, 144, 160, 160, 160, 240, 256, 272, 304, 304, 304, 384, 384, 400, 400, 416, 416, 416, 432, 512, 528, 544];
-        var arrx = [448, 704, 448, 704, 448, 704, 832, 848, 864, 928, 928, 928, 1024, 1040, 1056, 624, 720, 640, 704, 416, 656, 688, 416, 256, 256, 256];
+        // trap
+        arry = [112, 112, 128, 128, 144, 144, 160, 160, 160, 240, 256, 272, 304, 304, 304, 384, 384, 400, 400, 416, 416, 416, 432, 512, 528, 544];
+        arrx = [448, 704, 448, 704, 448, 704, 832, 848, 864, 928, 928, 928, 1024, 1040, 1056, 624, 720, 640, 704, 416, 656, 688, 416, 256, 256, 256];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          traps.get({
+          tsure.get({
             x: x,
             y: y,
             startX: x,
@@ -377,21 +351,12 @@
             },
           });
         }
-      }
-      spawnTrap();
-
-      var spider = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 11
-      });
-
-
-      function spawnSpider() {
-        var arrY = [16, 16, 16, 160, 240, 272, 320, 464, 480, 528, 528];
-        var arrX = [752, 800, 848, 1040, 720, 336, 1088, 544, 976, 304, 368];
+        // spider
+        arrY = [16, 16, 16, 160, 240, 272, 320, 464, 480, 528, 528];
+        arrX = [752, 800, 848, 1040, 720, 336, 1088, 544, 976, 304, 368];
         for (var i in arrX) {
           var x = arrX[i], y = arrY[i];
-          spider.get({
+          tsure.get({
             x: x,
             y: y,
             Y: 0,
@@ -422,25 +387,16 @@
             },
           });
         }
-      }
-      spawnSpider();
-
-      var ghosts = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 19
-      });
-
-
-      function spawnGhost() {
-        var arry = [160, 192, 224, 224, 240, 256, 304, 368, 432];
-        var arrx = [944, 64, 496, 992, 656, 1072, 656, 96, 784];
+        // ghost
+        arry = [160, 192, 224, 224, 240, 256, 304, 368, 432];
+        arrx = [944, 64, 496, 992, 656, 1072, 656, 96, 784];
         var arrY = [96, 96, 128, 208, 208, 240, 400, 496, 512, 544];
         var arrX = [736, 800, 544, 288, 384, 192, 32, 432, 208, 464];
 
         // var funarr = [horver,]
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          ghosts.get({
+          tsure.get({
             x: x,
             y: y,
             X: 0,
@@ -474,7 +430,7 @@
         }
         for (var i in arrX) {
           var x = arrX[i], y = arrY[i];
-          ghosts.get({
+          tsure.get({
             x: x,
             y: y,
             Y: 0,
@@ -505,21 +461,11 @@
             },
           });
         }
-      }
-
-
-      // create the walking man sprite sheet and animations
-      var routes = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 4
-      });
-
-      function spawnRoutes() {
-        var arry = [208, 224, 480, 112];
-        var arrx = [784, 608, 992, 976];
+        arry = [208, 224, 480, 112];
+        arrx = [784, 608, 992, 976];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          routes.get({
+          tsure.get({
             x: x,
             y: y,
             startX: x,
@@ -540,14 +486,10 @@
           });
         }
       }
-      spawnRoutes();
+      spawnTsure();
 
-      var princess = kontra.pool({
-        create: kontra.sprite,
-        maxSize: 1
-      });
 
-        princess.get({
+        tsure.get({
             x: 752,
             y: 208,
             startX: 752,
@@ -695,36 +637,27 @@
 
       var loop = kontra.gameLoop({
         update: function () {
-          ghosts.update();
-          lamps.update();
-          traps.update();
-          Switch.update();
-          sgate.update();
           tsure.update();
-          spider.update();
-          princess.update();
-          routes.update();
+          sgate.update();
 
-          if (ghosts.getAliveObjects().length === 0) {
-            spawnGhost();
-          }
           quadtree.clear();
-          quadtree.add(Switch.getAliveObjects(), princess.getAliveObjects(),sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects(), routes.getAliveObjects());
+          quadtree.add(tsure.getAliveObjects());
           var objects = quadtree.get(player);
 
           for (var i = 0, obj; obj = objects[i]; i++) {
             if (obj.type === 'r' && obj.collidesWith(player)){
-              var blocksize = 20, sign =1,x,y,dx = 112;
+              var blocksize = 20, sign =1,x,y,dx = 112,dy=112;
 
               if (obj.startX == 784 && obj.startY == 208){
-                x = 608, y = 224;
+                x = 608, y = 224,sign =-1;;
               }else if (obj.startX == 608 && obj.startY == 224){
-                x=783, y = 208,sign =-1;
+                x=784, y = 208;
               }else if (obj.startX == 992 && obj.startY == 480){
                 x=976, y = 112;
+                dx+=96;
               }else if(obj.startX == 976 && obj.startY == 112){
                 x=992, y = 480;
-                dx = 240;
+                dx+=112;
               }
               player.x = dx + sign*blocksize;
               player.y = dy + sign*blocksize;
@@ -801,15 +734,8 @@
         render: function () {
           tileEngine.render();
           player.render();
-          ghosts.render();
-          lamps.render();
-          traps.render();
-          Switch.render();
-          sgate.render();
           tsure.render();
-          spider.render();
-          princess.render();
-          routes.render();
+          sgate.render();
         }
 
       });
