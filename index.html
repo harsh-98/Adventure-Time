@@ -36,9 +36,16 @@
       text-align: center;
       text-decoration: none;
       display: inline-block;
-      font-size: 16px;
       margin-top: 20px;
+      font-size: 16px;
       cursor: pointer;
+    }
+    .name {
+      font-size: 20px;
+      color: white;
+      margin-top: 5px;
+      margin-bottom: 5px;
+
     }
 
   </style>
@@ -47,7 +54,8 @@
 
 <body>
 
-  <!-- <canvas width="352" height="180"></canvas> -->
+  <!-- <canvas width="352" height="176"></canvas> -->
+  <div class="name">Adventure Time: Chapter Save Princess</div>
   <canvas width="1600" height="800"></canvas>
 
   <div id="float">
@@ -649,8 +657,41 @@
           }
         },
       });
+      const context = new AudioContext();
+      function NotesGenerator() {
+        this.playNote = function(v) {
+          const oscillator = context.createOscillator();
+
+          const waveForm = Math.random() > 0.5 ? "sine" : "triangle";
+          oscillator.type = waveForm;
+          console.log(v)
+          oscillator.frequency.value = v;
+
+          const gainNode = context.createGain();
+          gainNode.gain.value = 0.2;
+
+          // generate sound
+          oscillator.connect(gainNode);
+          gainNode.connect(context.destination);
+
+          oscillator.start(0);
+
+          const duration = 2.5;
+
+          gainNode.gain.linearRampToValueAtTime(
+            0.0001,
+            context.currentTime + duration
+          );
+          oscillator.stop(context.currentTime + duration);
+        };
+
+      }
+
       // clamp player position in the game world
       player.position.clamp(0, 0, kontra.canvas.width - player.width, kontra.canvas.height - player.height);
+
+      let notesGenerator = new NotesGenerator(), frames = 60, v=0, muted = 1 ;
+      var nextNote = [196,65.5,496,588,880,440,588,98,165,660,392,330,165,392,123.5,524,349];
 
       var loop = kontra.gameLoop({
         update: function () {
@@ -688,6 +729,7 @@
                     result = sgate.objects.find(obj => {
                       return obj.startX === 1072 && obj.startY == 592
                     })
+
                   result.toggle()
                   obj.count = 30;
                 }
@@ -695,6 +737,16 @@
               player.y +=player.speed;
               return;
             } else if ((obj.type === 'gems' || obj.type == 'gold') && obj.collidesWith(player)) {
+              var o = context.createOscillator()
+              var  g = context.createGain()
+              o.connect(g)
+              var frequency = 261.6
+              o.frequency.value = frequency
+              g.connect(context.destination)
+              if(muted == 0){
+                o.start(0)
+                o.stop(context.currentTime + .1)
+              }
 
               obj.ttl = 0;
               if (obj.type == 'gold')
@@ -709,6 +761,17 @@
             }
           }
           player.update();
+
+        if(muted == 0)
+        if(frames == 0){
+          v++;
+          v%=17;
+          notesGenerator.playNote(nextNote[v]);
+          frames = 60;
+        }else{
+          frames--;
+        }
+
         },
         render: function () {
           tileEngine.render();
@@ -732,6 +795,10 @@
       }
 
       loop.start();
+
+       kontra.keys.bind('m', function() {
+          muted = muted == 0 ? 1 : 0;
+      });
     });
   </script>
 </body>
