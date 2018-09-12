@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html>
-
 <head>
   <title>Tile Engine</title>
   <style>
@@ -30,7 +27,7 @@
     button {
       background-color: #4CAF50;
       /* Green */
-      border: none;
+      display:none;
       padding: 15px 32px;
       text-align: center;
       margin-top: 20px;
@@ -54,39 +51,36 @@
     }
 
   </style>
-  <script type="text/javascript" src="kontra.js"></script>
+  <script type="text/javascript" src="kontra.min.js"></script>
 </head>
 
 <body>
 
-  <div class="name">Adventure Time: Chapter Save Princess</div>
+  <div class="name c">Adventure Time: Save Princess</div>
   <canvas width="352" height="176"></canvas>
-  <!-- <canvas width="1600" height="800px"></canvas> -->
+  <!-- <canvas width="1120" height="560"></canvas> -->
 
   <div id="float">
     <div class="c">Score:
       <span id="score">0</span>
     </div>
-    <button id="button" class="c" style="display:none" onclick="startGame()">Restart</button>
+    <button id="b" class="c" onclick="location.reload()">Restart</button>
     <div id="state">Game Started</div>
   </div>
-  <div class="ins c">Instructions --<br> Mute: m <br> Arrow: Navigate</div>
-  <script id="code">
+  <div class="ins c">Mute: m</div>
+  <script>
     kontra.init();
-    var playscore = 0, stag = document.getElementById('score'), button = document.getElementById('button'), state = document.getElementById('state');
+    var playscore = 0, stag = document.getElementById('score'), state = document.getElementById('state');
 
 
     kontra.assets.imagePath = 'assets/';
     kontra.assets.dataPath = 'assets/';
-    function startGame() {
-      location.reload();
-    };
     setTimeout(function () {
       state.innerHTML = "";
-      document.getElementById('button').style.display = "inline-block";
+      document.getElementById('b').style.display = "inline-block";
     }, 2000);
 
-    kontra.assets.load('terrain.json', 'man.png', 'new.png').then(function () {
+    kontra.assets.load('terrain.json','new.png').then(function () {
       var terrain = kontra.assets.data.terrain;
       var quadtree = kontra.quadtree();
       tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
@@ -95,32 +89,122 @@
 
       var tsure = kontra.pool({
         create: kontra.sprite,
-        maxSize: 75
+        maxSize: 90
       });
-      var tsure_animation = kontra.spriteSheet({
+      var ani = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
         frameHeight: 16,
         animations: {
-          gold: {
+          d: {
             frames: [90],  // frames 105 through 112
             frameRate: 3,
             loop: false
           },
-          gems: {
+          g: {
             frames: [91],  // frames 105 through 112
             frameRate: 3,
             loop: false
+          },
+          so: {
+            frames: [100, 101, 102],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          sc: {
+            frames: [102, 101, 100],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          sd: {
+            frames: [100],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          go: {
+            frames: [48, 93, 9, 59],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          gc: {
+            frames: [59, 9, 93, 48],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          gd: {
+            frames: [48],  // frames 105 through 112
+            frameRate: 3,
+            loop: false
+          },
+          t: {
+            frames: [103, 104, 105],  // frames 105 through 112
+            frameRate: .1,
+          },
+          swd: {
+            frames: [61, 62, 63],  // frames 105 through 112
+            frameRate: 12
+          },
+          swu: {
+            frames: [81, 82, 83],
+            frameRate: 12
+          },
+          l: {
+            frames: [107, 108, 109],  // frames 105 through 112
+            frameRate: .1
+          },
+          r : {
+            frames: [15],  // frames 105 through 112
+            frameRate: 6
+          },
+          wu: {
+            frames: [44, 34, 24],  // frames 105 through 112
+            frameRate: 12
+          },
+          wl: {
+            frames: [2, 12, 22],
+            frameRate: 12
+          },
+          wd: {
+            frames: [10, 76, 1],
+            frameRate: 12
+          },
+          wr: {
+            frames: [33, 40, 41],
+            frameRate: 12
+          },
+          dd: {
+            frames: [11],
+            frameRate: 12
+          },
+          ps: {
+            frames: [10,1],
+            frameRate: 3
+          },
+          gwu: {
+            frames: [80, 77, 67],  // frames 105 through 112
+            frameRate: 12
+          },
+          gwl: {
+            frames: [16, 26, 36],
+            frameRate: 12
+          },
+          gwd: {
+            frames: [60, 55, 45],
+            frameRate: 12
+          },
+          gwr: {
+            frames: [7, 0, 75],
+            frameRate: 12
           }
         }
       });
 
       function spawnTsure() {
-        var arry = [16, 32, 32, 32, 64, 64, 64, 80, 80, 80, 112, 128, 128, 128, 128, 144, 144, 144, 160, 160, 208, 224, 224, 240, 256, 256, 352, 368, 368, 400, 448, 448, 464, 480, 480, 496, 496, 496, 496, 496, 528, 544, 544, 576, 576, 592, 688, 688, 704, 704, 704, 720, 720, 736, 736, 752, 752, 0, 0, 16, 16, 320, 320, 512, 528, 528, 544, 560, 608, 624, 656, 672, 672, 720, 768];
-        var arrx = [416, 352, 368, 448, 64, 80, 96, 64, 80, 96, 1152, 496, 512, 528, 1168, 512, 528, 1152, 528, 1168, 336, 304, 384, 352, 304, 368, 1120, 1008, 1040, 1104, 1008, 1072, 976, 1040, 1056, 608, 688, 1024, 1072, 1088, 640, 608, 672, 608, 640, 672, 944, 1024, 336, 416, 976, 400, 1008, 368, 960, 960, 992, 752, 784, 736, 768, 1424, 1440, 1552, 512, 1568, 1568, 1552, 1440, 1424, 1552, 1488, 1504, 1536, 1536];
+        var arry = [0, 0, 0, 16, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 32, 32, 48, 48, 48, 64, 64, 64, 80, 80, 80, 80, 80, 112, 112, 128, 128, 128, 144, 144, 144, 144, 160, 160,208, 208, 208, 208, 224, 224, 240, 240, 240, 256, 256, 272, 272, 272, 288, 320, 320, 320, 320, 320, 336, 336, 336, 352, 352, 352, 352, 352, 368, 368, 368, 384, 384,416, 432, 432, 448, 464, 480, 480, 480, 480, 496, 496, 512, 512, 512, 528, 528, 544, 544];
+        var arrx = [720, 768, 816, 432, 464, 736, 768, 784, 832, 352, 368, 384, 448, 496, 720, 768, 816, 352, 368, 384, 64, 80, 96, 64, 80, 96, 688, 704, 496, 512, 256, 272, 512, 256,272, 496, 512, 256, 272, 336, 640, 672, 704, 304, 720, 320, 368, 688, 320, 368, 624, 656, 688, 704, 176, 208, 240, 624, 672, 192, 224, 704, 176, 208, 240, 480, 848,192, 224, 832, 496, 848, 480, 1008, 1088, 1040, 1008, 576, 640, 688, 1056, 608, 1024, 16, 656, 688, 48, 512, 16, 80];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
-          var type = ['gold', 'gems'];
+          var type = ['d', 'g'];
           var type = type[Math.floor(Math.random() * 2)]
           tsure.get(function (types) {
             return {
@@ -128,7 +212,7 @@
               y: y,
               startX: x,
               startY: y,
-              animations: tsure_animation.animations,
+              animations: ani.animations,
               ttl: Infinity,
               type: types,
               way: 1,
@@ -150,32 +234,9 @@
         create: kontra.sprite,
         maxSize: 3
       });
-      var switch_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          gate_open: {
-            frames: [100, 101, 102],  // frames 105 through 112
-            frameRate: 3,
-            loop: false
-          },
-          gate_close: {
-            frames: [102, 101, 100],  // frames 105 through 112
-            frameRate: 3,
-            loop: false
-          },
-          no_motion: {
-            frames: [100],  // frames 105 through 112
-            frameRate: 3,
-            loop: false
-          }
-        }
-      });
-
       function spawnswitch() {
-        var arry = [128, 144, 736];
-        var arrx = [112, 432, 1520];
+        var arry = [144, 144, 512];
+        var arrx = [112, 432, 960];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           Switch.get({
@@ -183,26 +244,26 @@
             y: y,
             startX: x,
             startY: y,
-            animations: switch_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
             count: 30,
             way: 1,
-            start: 1,
-            type: 'switch',
+            s: 1,
+            type: 's',
             toggle: function () {
               if (this.way) {
-                this.playAnimation('gate_open')
+                this.playAnimation('so')
                 this.way = 0
               } else {
-                this.playAnimation('gate_close')
+                this.playAnimation('sc')
                 this.way = 1
               }
             },
             update: function () {
               this.advance();
-              if (this.start) {
-                this.playAnimation('no_motion')
-                this.start = 0
+              if (this.s) {
+                this.playAnimation('sd')
+                this.s = 0
               }
               // change enemy velocity to move back and forth
               this.x = this.startX - tileEngine.sx;
@@ -218,32 +279,10 @@
         maxSize: 3
       });
 
-      var sgate_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          gate_open: {
-            frames: [48, 93, 9, 59],  // frames 105 through 112
-            frameRate: 3,
-            loop: false
-          },
-          gate_close: {
-            frames: [59, 9, 93, 48],  // frames 105 through 112
-            frameRate: 3,
-            loop: false
-          },
-          no_motion: {
-            frames: [48],  // frames 105 through 112
-            frameRate: 3,
-            loop: false
-          }
-        }
-      });
 
       function spawnsGate() {
-        var arry = [112, 592, 80];
-        var arrx = [80, 1072, 400];
+        var arry = [80, 112, 416];
+        var arrx = [400, 80, 672];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           sgate.get({
@@ -253,22 +292,22 @@
             startY: y,
             way: 1,
             start: 1,
-            animations: sgate_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
-            type: 'gate',
+            type: 'gt',
             toggle: function () {
               if (this.way) {
-                this.playAnimation('gate_open')
+                this.playAnimation('go')
                 this.way = 0
               } else {
-                this.playAnimation('gate_close')
+                this.playAnimation('gc')
                 this.way = 1
               }
             },
             update: function () {
               this.advance();
               if (this.start) {
-                this.playAnimation('no_motion')
+                this.playAnimation('gd')
                 this.start = 0
               }
               // change enemy velocity to move back and forth
@@ -282,27 +321,12 @@
 
       var lamps = kontra.pool({
         create: kontra.sprite,
-        maxSize: 49
-      });
-
-      var lamp_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          default: {
-            frames: [107, 108, 109],  // frames 105 through 112
-            frameRate: 6
-          }, routing : {
-            frames: [15],  // frames 105 through 112
-            frameRate: 6
-          }
-        }
+        maxSize: 44
       });
 
       function spawnLamp() {
-        var arry = [48, 48, 96, 96, 336, 336, 336, 336, 336, 336, 336, 336, 336, 336, 336, 336, 352, 352, 352, 368, 384, 384, 400, 416, 416, 416, 416, 432, 432, 448, 448, 464, 464, 480, 480, 496, 496, 512, 512, 528, 528, 544, 544, 544, 544, 544, 544, 544, 544];
-        var arrx = [48, 112, 48, 112, 976, 992, 1008, 1024, 1040, 1056, 1072, 1088, 1104, 1120, 1136, 1152, 960, 976, 1152, 960, 960, 1152, 1152, 960, 1120, 1136, 1152, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 1120, 960, 976, 992, 1008, 1024, 1040, 1104, 1120];
+        var arry = [48, 48, 96, 96, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 208, 224, 240, 240, 240, 240, 240, 256, 256, 272, 272, 288, 288, 304, 304, 320, 320, 336, 336, 352, 352, 368, 368, 368, 368, 368, 368, 384];
+        var arrx = [48, 112, 48, 112, 608, 624, 640, 656, 672, 688, 704, 720, 736, 752, 768, 784, 608, 784, 608, 736, 752, 768, 784, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 736, 608, 624, 640, 704, 720, 736, 368];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           lamps.get({
@@ -310,13 +334,13 @@
             y: y,
             startX: x,
             startY: y,
-            animations: lamp_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
-            type: 'lamp',
+            w:1,
+            type: 'l',
             update: function () {
               this.advance();
-
-              // change enemy velocity to move back and forth
+              if(this.w == 1){this.playAnimation('l');this.w--;}
               this.x = this.startX - tileEngine.sx;
               this.y = this.startY - tileEngine.sy;
             },
@@ -327,28 +351,12 @@
 
       var traps = kontra.pool({
         create: kontra.sprite,
-        maxSize: 30
-      });
-
-      var trap_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          pattern1: {
-            frames: [103, 104, 105],  // frames 105 through 112
-            frameRate: 2
-          },
-          pattern0: {
-            frames: [104, 105, 103],  // frames 105 through 112
-            frameRate: 2
-          }
-        }
+        maxSize: 26
       });
 
       function spawnTrap() {
-        var arry = [112, 112, 128, 128, 144, 144, 352, 352, 368, 368, 384, 384, 560, 560, 560, 576, 576, 576, 576, 592, 592, 592, 592, 592, 640, 640, 640, 640, 656, 672];
-        var arrx = [448, 704, 448, 704, 448, 704, 1280, 1360, 1280, 1360, 1280, 1360, 1024, 1040, 1120, 1040, 1104, 1120, 1488, 1040, 1056, 1088, 1104, 1488, 368, 384, 400, 1296, 1296, 1296];
+        var arry = [112, 112, 128, 128, 144, 144, 160, 160, 160, 240, 256, 272, 304, 304, 304, 384, 384, 400, 400, 416, 416, 416, 432, 512, 528, 544];
+        var arrx = [448, 704, 448, 704, 448, 704, 832, 848, 864, 928, 928, 928, 1024, 1040, 1056, 624, 720, 640, 704, 416, 656, 688, 416, 256, 256, 256];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           traps.get({
@@ -356,11 +364,14 @@
             y: y,
             startX: x,
             startY: y,
-            animations: trap_animation.animations,
+            w:1,
+            animations: ani.animations,
             ttl: Infinity,
-            type: 'trap',
+            type: 't',
             update: function () {
               this.advance();
+              if(this.w == 1){this.playAnimation('t');
+              this.w--;}
               this.x = this.startX - tileEngine.sx;
               this.y = this.startY - tileEngine.sy;
             },
@@ -371,37 +382,13 @@
 
       var spider = kontra.pool({
         create: kontra.sprite,
-        maxSize: 5
+        maxSize: 11
       });
 
-
-      var spider_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          walk_down: {
-            frames: [61, 62, 63],  // frames 105 through 112
-            frameRate: 12
-          },
-          walk_right: {
-            frames: [46, 47, 49],
-            frameRate: 12
-          },
-          walk_left: {
-            frames: [17, 27, 37],
-            frameRate: 12
-          },
-          walk_up: {
-            frames: [81, 82, 83],
-            frameRate: 12
-          }
-        }
-      });
 
       function spawnSpider() {
-        var arrY = [512, 576, 704, 768, 768];
-        var arrX = [304, 416, 768, 688, 800];
+        var arrY = [16, 16, 16, 160, 240, 272, 320, 464, 480, 528, 528];
+        var arrX = [752, 800, 848, 1040, 720, 336, 1088, 544, 976, 304, 368];
         for (var i in arrX) {
           var x = arrX[i], y = arrY[i];
           spider.get({
@@ -410,12 +397,12 @@
             Y: 0,
             startX: x,
             startY: y,
-            animations: spider_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
             bottomEdge: 32 + 16,
             topEdge: -32,
             speedy: .5,
-            type: 'ghost',
+            type: 'gh',
             update: function () {
               this.advance();
               this.Y += this.speedy;
@@ -428,9 +415,9 @@
                 this.speedy = -Math.abs(this.speedy);
               }
               if (this.speedy > 0) {
-                this.playAnimation('walk_down')
+                this.playAnimation('swd')
               } else if (this.speedy < 0) {
-                this.playAnimation('walk_up')
+                this.playAnimation('swu')
               }
             },
           });
@@ -440,39 +427,15 @@
 
       var ghosts = kontra.pool({
         create: kontra.sprite,
-        maxSize: 16
+        maxSize: 19
       });
 
-
-      var ghost_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          walk_up: {
-            frames: [80, 77, 67],  // frames 105 through 112
-            frameRate: 12
-          },
-          walk_left: {
-            frames: [16, 26, 36],
-            frameRate: 12
-          },
-          walk_down: {
-            frames: [60, 55, 45],
-            frameRate: 12
-          },
-          walk_right: {
-            frames: [7, 0, 75],
-            frameRate: 12
-          }
-        }
-      });
 
       function spawnGhost() {
-        var arry = [160, 192, 208, 224, 320, 368];
-        var arrx = [384, 1424, 80, 1168, 288, 80];
-        var arrY = [400, 496, 496, 512, 512, 560, 560, 560, 672, 720];
-        var arrX = [32, 800, 832, 240, 448, 272, 784, 816, 1120, 896];
+        var arry = [160, 192, 224, 224, 240, 256, 304, 368, 432];
+        var arrx = [944, 64, 496, 992, 656, 1072, 656, 96, 784];
+        var arrY = [96, 96, 128, 208, 208, 240, 400, 496, 512, 544];
+        var arrX = [736, 800, 544, 288, 384, 192, 32, 432, 208, 464];
 
         // var funarr = [horver,]
         for (var i in arrx) {
@@ -483,12 +446,12 @@
             X: 0,
             startX: x,
             startY: y,
-            animations: ghost_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
             leftEdge: -32,
             rightEdge: 32 + 16,
             speedx: .5,
-            type: 'ghost',
+            type: 'gh',
             update: function () {
               this.advance();
 
@@ -502,9 +465,9 @@
                 this.speedx = -Math.abs(this.speedx);
               }
               if (this.speedx > 0) {
-                this.playAnimation('walk_right')
+                this.playAnimation('gwr')
               } else if (this.speedx < 0) {
-                this.playAnimation('walk_left')
+                this.playAnimation('gwl')
               }
             },
           });
@@ -517,12 +480,12 @@
             Y: 0,
             startX: x,
             startY: y,
-            animations: ghost_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
             bottomEdge: 32 + 16,
             topEdge: -32,
             speedy: .5,
-            type: 'ghost',
+            type: 'gh',
             update: function () {
               this.advance();
               this.Y += this.speedy;
@@ -535,9 +498,9 @@
                 this.speedy = -Math.abs(this.speedy);
               }
               if (this.speedy > 0) {
-                this.playAnimation('walk_down')
+                this.playAnimation('gwd')
               } else if (this.speedy < 0) {
-                this.playAnimation('walk_up')
+                this.playAnimation('gwu')
               }
             },
           });
@@ -552,8 +515,8 @@
       });
 
       function spawnRoutes() {
-        var arry = [368, 400, 720,112];
-        var arrx = [1152, 960, 1488,1424];
+        var arry = [208, 224, 480, 112];
+        var arrx = [784, 608, 992, 976];
         for (var i in arrx) {
           var x = arrx[i], y = arry[i];
           routes.get({
@@ -563,12 +526,12 @@
             startY: y,
             way:1,
             ttl: Infinity,
-            type: 'route',
-            animations: lamp_animation.animations,
+            type: 'r',
+            animations: ani.animations,
             update: function () {
               // this.advance();
               if(this.way){
-                this.playAnimation('routing');
+                this.playAnimation('r');
                 this.way=0;
               }
               this.x = this.startX - tileEngine.sx;
@@ -584,53 +547,21 @@
         maxSize: 1
       });
 
-      var player_animation = kontra.spriteSheet({
-        image: kontra.assets.images.new,
-        frameWidth: 16,
-        frameHeight: 16,
-        animations: {
-          walk_up: {
-            frames: [44, 34, 24],  // frames 105 through 112
-            frameRate: 12
-          },
-          walk_left: {
-            frames: [2, 12, 22],
-            frameRate: 12
-          },
-          walk_down: {
-            frames: [10, 76, 1],
-            frameRate: 12
-          },
-          walk_right: {
-            frames: [33, 40, 41],
-            frameRate: 12
-          },
-          dead: {
-            frames: [11],
-            frameRate: 12
-          },
-          princess: {
-            frames: [10,1],
-            frameRate: 3
-          }
-        }
-      });
-
         princess.get({
-            x: 1072,
-            y: 354,
-            startX: 1072,
-            startY: 384,
+            x: 752,
+            y: 208,
+            startX: 752,
+            startY: 208,
             time: 0,
-            animations: player_animation.animations,
+            animations: ani.animations,
             ttl: Infinity,
-            type: 'princess',
+            type: 'ps',
             update: function () {
               this.advance();
               this.x = this.startX - tileEngine.sx;
               this.y = this.startY - tileEngine.sy;
               if(this.time == 0){
-                this.playAnimation('princess')
+                this.playAnimation('ps')
                 this.time = 60
               }
               else {
@@ -644,9 +575,11 @@
         speed: 1,
         startX: 176,
         startY: 88,
-        animations: player_animation.animations,
+        w:1,
+        animations: ani.animations,
         update: function () {
           // create a smaller bounding box for the player's collision
+          if(this.w){this.w=0;this.playAnimation('wd')}
           var collisionBox = {
             y: this.y + 4,
             x: this.x + 2,
@@ -658,7 +591,7 @@
             if (tileEngine.layerCollidesWith('top', collisionBox)) {
               return;
             }
-            this.playAnimation('walk_up');
+            this.playAnimation('wu');
             this.advance();
             collisionBox.y -= this.speed;
             if (tileEngine.sy > 0 && this.y <= this.startY) {
@@ -670,7 +603,7 @@
           }
 
           else if (kontra.keys.pressed('down')) {
-            this.playAnimation('walk_down');
+            this.playAnimation('wd');
 
             this.advance();
 
@@ -688,7 +621,7 @@
           }
 
           else if (kontra.keys.pressed('left')) {
-            this.playAnimation('walk_left');
+            this.playAnimation('wl');
 
             this.advance();
 
@@ -706,7 +639,7 @@
           }
 
           else if (kontra.keys.pressed('right')) {
-            this.playAnimation('walk_right');
+            this.playAnimation('wr');
 
             this.advance();
 
@@ -780,38 +713,36 @@
           var objects = quadtree.get(player);
 
           for (var i = 0, obj; obj = objects[i]; i++) {
-            if (obj.type === 'route' && obj.collidesWith(player)){
-              var blocksize = 20, sign =1,x,y,dx = 112,dy=112;
+            if (obj.type === 'r' && obj.collidesWith(player)){
+              var blocksize = 20, sign =1,x,y,dx = 112;
 
-              if (obj.startX == 1152 && obj.startY == 368){
-                x = 960, y = 400, sign =-1;
-              }else if (obj.startX == 960 && obj.startY == 400){
-                x=1152, y = 368;
-              }else if (obj.startX == 1488 && obj.startY == 720){
-                x=1424, y = 112;
-              }else if(obj.startX == 1424 && obj.startY == 112){
-                x=1488, y = 720;
+              if (obj.startX == 784 && obj.startY == 208){
+                x = 608, y = 224;
+              }else if (obj.startX == 608 && obj.startY == 224){
+                x=783, y = 208,sign =-1;
+              }else if (obj.startX == 992 && obj.startY == 480){
+                x=976, y = 112;
+              }else if(obj.startX == 976 && obj.startY == 112){
+                x=992, y = 480;
                 dx = 240;
               }
-              console.log(x,y);
-              console.log("route");
               player.x = dx + sign*blocksize;
               player.y = dy + sign*blocksize;
               tileEngine.sx = x - 112;
               tileEngine.sy = y - 112;
 
 
-            }else if(obj.type === 'princess' && obj.collidesWith(player)) {
+            }else if(obj.type === 'ps' && obj.collidesWith(player)) {
               loop.stop();
               alert("Hurrayyy, you saved our dear princess:)");
 
-            }else if (obj.type === 'switch' && obj.collidesWith(player)) {
+            }else if (obj.type === 's' && obj.collidesWith(player)) {
                 if (obj.count) {
                   obj.count--;
                 } else {
                   obj.toggle();
                   var result = {toggle: function(){}}
-                  if (obj.startX == 112 && obj.startY == 128)
+                  if (obj.startX == 112 && obj.startY == 144)
                   result = sgate.objects.find(obj => {
                     return obj.startX === 80 && obj.startY == 112
                   })
@@ -819,18 +750,18 @@
                     result = sgate.objects.find(obj => {
                       return obj.startX === 400 && obj.startY == 80
                     })
-                  else if (obj.startX == 1520 && obj.startY == 736)
+                  else if (obj.startX == 960 && obj.startY == 512)
                     result = sgate.objects.find(obj => {
-                      return obj.startX === 1072 && obj.startY == 592
+                      return obj.startX === 672 && obj.startY == 416
                     })
 
                   result.toggle()
                   obj.count = 30;
                 }
-            } else if (obj.type === 'gate' && obj.collidesWith(player) && obj.way == 1) {
+            } else if (obj.type === 'gt' && obj.collidesWith(player) && obj.way == 1) {
               player.y +=player.speed;
               return;
-            } else if ((obj.type === 'gems' || obj.type == 'gold') && obj.collidesWith(player)) {
+            } else if ((obj.type === 'd' || obj.type == 'g') && obj.collidesWith(player)) {
               var o = context.createOscillator()
               var  g = context.createGain()
               o.connect(g)
@@ -843,14 +774,14 @@
               }
 
               obj.ttl = 0;
-              if (obj.type == 'gold')
+              if (obj.type == 'd')
                 playscore += 100;
-              if (obj.type == 'gems')
+              if (obj.type == 'g')
                 playscore += 200;
               stag.innerHTML = playscore;
 
-            } else if ((obj.type == 'ghost' || obj.type == 'trap') && obj.collidesWith(player)) {
-              player.playAnimation('dead');
+            } else if ((obj.type == 'gh' || obj.type == 't') && obj.collidesWith(player)) {
+              player.playAnimation('dd');
               gameOver();
             }
           }
@@ -879,7 +810,6 @@
           spider.render();
           princess.render();
           routes.render();
-
         }
 
       });
