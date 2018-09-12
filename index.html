@@ -360,9 +360,78 @@
       }
       spawnTrap();
 
+      var spider = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 5
+      });
+
+
+      var spider_animation = kontra.spriteSheet({
+        image: kontra.assets.images.new,
+        frameWidth: 16,
+        frameHeight: 16,
+        animations: {
+          walk_down: {
+            frames: [61, 62, 63],  // frames 105 through 112
+            frameRate: 12
+          },
+          walk_right: {
+            frames: [46, 47, 49],
+            frameRate: 12
+          },
+          walk_left: {
+            frames: [17,27,37],
+            frameRate: 12
+          },
+          walk_up: {
+            frames: [81,82,83],
+            frameRate: 12
+          }
+        }
+      });
+
+      function spawnSpider() {
+        var arrY = [512, 576, 704, 768, 768];
+        var arrX = [304, 416, 768, 688, 800];
+        for (var i in arrX) {
+          var x = arrX[i], y = arrY[i];
+          spider.get({
+            x: x,
+            y: y,
+            Y: 0,
+            startX: x,
+            startY: y,
+            animations: spider_animation.animations,
+            ttl: Infinity,
+            bottomEdge: 32 + 16,
+            topEdge: -32,
+            speedy: .5,
+            type: 'ghost',
+            update: function () {
+              this.advance();
+              this.Y += this.speedy;
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY + this.Y - tileEngine.sy;
+              if (this.Y <= this.topEdge) {
+                this.speedy = Math.abs(this.speedy);
+              }
+              else if (this.Y >= this.bottomEdge) {
+                this.speedy = -Math.abs(this.speedy);
+              }
+              if (this.speedy > 0) {
+                this.playAnimation('walk_down')
+              } else if (this.speedy < 0) {
+                this.playAnimation('walk_up')
+              }
+            },
+          });
+        }
+      }
+      spawnSpider();
+
       var ghosts = kontra.pool({
         create: kontra.sprite,
-        maxSize: 18
+        maxSize: 16
       });
 
 
@@ -390,58 +459,11 @@
         }
       });
 
-      // function () {
-      //     console.log(this)
-      //     this.advance();
-
-      //     // change enemy velocity to move back and forth
-      //     this.X += this.speedx;
-      //     this.x = this.startX + this.X - tileEngine.sx;
-
-      //     if (this.X <= this.leftEdge) {
-      //       this.speedx = Math.abs(this.speedx);
-      //     }
-      //     else if (this.X >= this.rightEdge) {
-      //       this.speedx = -Math.abs(this.speedx);
-      //     }
-
-      //     if (this.speedx > 0) {
-      //       this.playAnimation('walk_right')
-      //     } else if (this.speedx < 0) {
-      //       this.playAnimation('walk_left')
-      //     }
-      // }
-      // function () {
-      //   // return function () {
-
-      //     this.advance();
-
-      //     // change enemy velocity to move back and forth
-      //     this.Y += this.speedy;
-      //     this.y = this.startY + this.Y - tileEngine.sy;
-
-      //     if (this.Y <= this.topEdge) {
-      //       this.speedy = Math.abs(this.speedy);
-      //     }
-      //     else if (this.Y >= this.bottomEdge) {
-      //       this.speedy = -Math.abs(this.speedy);
-      //     }
-
-      //     if (this.speedy > 0) {
-      //       this.playAnimation('walk_down')
-      //     } else if (this.speedy < 0) {
-      //       this.playAnimation('walk_up')
-      //     }
-      //   // }
-      // }
-
       function spawnGhost() {
-        var arrx = [];
         var arry = [160, 192, 208, 224, 320, 368];
         var arrx = [384, 1424, 80, 1168, 288, 80];
         var arrY = [400, 496, 496, 512, 512, 560, 560, 560, 672, 720];
         var arrX = [32, 800, 832, 240, 448, 272, 784, 816, 1120, 896];
-        var width = 16;
 
         // var funarr = [horver,]
         for (var i in arrx) {
@@ -455,11 +477,10 @@
             animations: ghost_animation.animations,
             ttl: Infinity,
             leftEdge: -32,
-            rightEdge: 32 + width,
+            rightEdge: 32 + 16,
             speedx: .5,
             type: 'ghost',
             update: function () {
-              console.log(this)
               this.advance();
 
               this.X += this.speedx;
@@ -489,7 +510,7 @@
             startY: y,
             animations: ghost_animation.animations,
             ttl: Infinity,
-            bottomEdge: 32 + width,
+            bottomEdge: 32 + 16,
             topEdge: -32,
             speedy: .5,
             type: 'ghost',
@@ -535,6 +556,10 @@
           },
           walk_right: {
             frames: [33, 40, 41],
+            frameRate: 12
+          },
+          dead: {
+            frames: [11],
             frameRate: 12
           }
         }
@@ -649,11 +674,12 @@
           Switch.update();
           sgate.update();
           tsure.update();
+          spider.update();
           if (ghosts.getAliveObjects().length === 0) {
             spawnGhost();
           }
           quadtree.clear();
-          quadtree.add(Switch.getAliveObjects(), sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), traps.getAliveObjects());
+          quadtree.add(Switch.getAliveObjects(), sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects());
           var objects = quadtree.get(player);
           player.update();
 
@@ -682,6 +708,9 @@
               if (obj.type == 'gems')
                 playscore += 200;
               stag.innerHTML = playscore;
+            }else if(obj.type = 'ghost' && obj.collidesWith(player)){
+              player.playAnimation('dead');
+              gameOver();
             }
           }
         },
@@ -694,6 +723,7 @@
           Switch.render();
           sgate.render();
           tsure.render();
+          spider.render();
         }
 
       });
