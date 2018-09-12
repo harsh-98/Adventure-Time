@@ -54,9 +54,9 @@
 
 <body>
 
-  <!-- <canvas width="352" height="176"></canvas> -->
   <div class="name">Adventure Time: Chapter Save Princess</div>
-  <canvas width="1600" height="800"></canvas>
+  <canvas width="352" height="176"></canvas>
+  <!-- <canvas width="1600" height="800"></canvas> -->
 
   <div id="float">
     <div id="dis">Score:
@@ -84,8 +84,8 @@
       var terrain = kontra.assets.data.terrain;
       var quadtree = kontra.quadtree();
       tileEngine = kontra.tileEngine(kontra.assets.data.terrain);
-      tileEngine.sx = 0,
-        tileEngine.sy = 0
+      tileEngine.sx = 768,
+        tileEngine.sy = 312
 
       var tsure = kontra.pool({
         create: kontra.sprite,
@@ -286,6 +286,9 @@
         animations: {
           default: {
             frames: [107, 108, 109],  // frames 105 through 112
+            frameRate: 6
+          }, routing : {
+            frames: [15],  // frames 105 through 112
             frameRate: 6
           }
         }
@@ -541,10 +544,44 @@
 
 
       // create the walking man sprite sheet and animations
+      var routes = kontra.pool({
+        create: kontra.sprite,
+        maxSize: 4
+      });
+
+      function spawnRoutes() {
+        var arry = [368, 400, 720,112];
+        var arrx = [1152, 960, 1488,1424];
+        for (var i in arrx) {
+          var x = arrx[i], y = arry[i];
+          routes.get({
+            x: x,
+            y: y,
+            startX: x,
+            startY: y,
+            way:1,
+            ttl: Infinity,
+            type: 'route',
+            animations: lamp_animation.animations,
+            update: function () {
+              // this.advance();
+              if(this.way){
+                this.playAnimation('routing');
+                this.way=0;
+              }
+              this.x = this.startX - tileEngine.sx;
+              this.y = this.startY - tileEngine.sy;
+            }
+          });
+        }
+      }
+      spawnRoutes();
+
       var princess = kontra.pool({
         create: kontra.sprite,
         maxSize: 1
       });
+
       var player_animation = kontra.spriteSheet({
         image: kontra.assets.images.new,
         frameWidth: 16,
@@ -693,7 +730,6 @@
 
           const waveForm = Math.random() > 0.5 ? "sine" : "triangle";
           oscillator.type = waveForm;
-          console.log(v)
           oscillator.frequency.value = v;
 
           const gainNode = context.createGain();
@@ -732,16 +768,37 @@
           tsure.update();
           spider.update();
           princess.update();
+          routes.update();
 
           if (ghosts.getAliveObjects().length === 0) {
             spawnGhost();
           }
           quadtree.clear();
-          quadtree.add(Switch.getAliveObjects(), princess.getAliveObjects(),sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects());
+          quadtree.add(Switch.getAliveObjects(), princess.getAliveObjects(),sgate.getAliveObjects(), tsure.getAliveObjects(), ghosts.getAliveObjects(), spider.getAliveObjects(), traps.getAliveObjects(), routes.getAliveObjects());
           var objects = quadtree.get(player);
 
           for (var i = 0, obj; obj = objects[i]; i++) {
-            if(obj.type === 'princess' && obj.collidesWith(player)) {
+            if (obj.type === 'route' && obj.collidesWith(player)){
+              var blocksize = 20, sign =1,x,y;
+
+              if (obj.startX == 1152 && obj.startY == 368){
+                x = 960, y = 400, sign =-1;
+              }else if (obj.startX == 960 && obj.startY == 400){
+                x=1152, y = 368;
+              }else if (obj.startX == 1488 && obj.startY == 720){
+                x=1424, y = 112;
+              }else if(obj.startX == 1488 && obj.startY == 112){
+                x=1488, y = 720;
+              }
+              console.log(x,y);
+              console.log("route");
+              player.x = 112 + sign*blocksize;
+              player.y = 112 + sign*blocksize;
+              tileEngine.sx = x - 112;
+              tileEngine.sy = y - 112;
+
+
+            }else if(obj.type === 'princess' && obj.collidesWith(player)) {
               loop.stop();
               alert("Hurrayyy, you saved our dear princess:)");
 
@@ -789,7 +846,7 @@
                 playscore += 200;
               stag.innerHTML = playscore;
 
-            } else if (obj.type == 'ghost' && obj.collidesWith(player)) {
+            } else if ((obj.type == 'ghost' || obj.type == 'trap') && obj.collidesWith(player)) {
               player.playAnimation('dead');
               gameOver();
             }
@@ -818,6 +875,7 @@
           tsure.render();
           spider.render();
           princess.render();
+          routes.render();
 
         }
 

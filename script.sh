@@ -6,5 +6,5 @@ cd ..
 du test
 tree test
 zip -r test.zip test
-du test.zip
+ls -al  test.zip
 cd tileEngine
